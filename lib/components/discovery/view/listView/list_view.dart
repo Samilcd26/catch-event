@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../../Data/Models/publisher_model.dart';
+import '../../../../Data/Models/organizer_model.dart';
 
-class PublisherListPage extends StatelessWidget {
-  PublisherListPage({super.key, required this.publisherdata});
-  late final List<PublisherModel> publisherdata;
+class OrganizerListPage extends StatelessWidget {
+  OrganizerListPage({super.key, required this.organizerdata});
+  late final List<OrganizerModel> organizerdata;
 
-  //final GmapViewModel gmapViewModel = GmapViewModel(PublisherService(NetworkProduct.instance.networkManager));
+  //final GmapViewModel gmapViewModel = GmapViewModel(OrganizerService(NetworkProduct.instance.networkManager));
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,13 +17,13 @@ class PublisherListPage extends StatelessWidget {
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
-            itemCount: publisherdata.length,
+            itemCount: organizerdata.length,
             itemBuilder: (context, pIndex) {
               return Container(
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
-                    //Publisher title
+                    //Organizer title
                     Row(
                       children: [
                         Container(
@@ -33,7 +33,7 @@ class PublisherListPage extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(publisherdata[pIndex].brand.toString()),
+                              child: Text(organizerdata[pIndex].title.toString()),
                             )),
                       ],
                     ),
@@ -47,63 +47,14 @@ class PublisherListPage extends StatelessWidget {
                         },
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
-                        itemCount: publisherdata[pIndex].event == null ? 0 : publisherdata[pIndex].event!.length,
+                        itemCount: organizerdata[pIndex].event == null ? 0 : organizerdata[pIndex].event!.length,
                         itemBuilder: (context, eIndex) {
-                          return Row(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.5,
-                                child: Card(
-                                  semanticContainer: true,
-                                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  child: Column(
-                                    children: [
-                                      //Event Image
-                                      Container(
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(publisherdata[pIndex].event![eIndex].image.toString()),
-                                                fit: BoxFit.cover)),
-                                      ),
-                                      Divider(),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(publisherdata[pIndex].event![eIndex].title.toString(),
-                                                    style: Theme.of(context).textTheme.bodyLarge),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 10),
-
-                                            //Adress Icon+text
-                                            const InfoIconText(
-                                              text: "Adressdasdasd",
-                                              icon: Icons.location_pin,
-                                            ),
-                                            const SizedBox(height: 5),
-
-                                            //Adress Icon+Date
-                                            Row(
-                                              children: [const Icon(Icons.date_range_outlined), Text("06/10/2023")],
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [const Icon(Icons.attach_money), Text("200TL")],
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
+                          return EventInfoCard(
+                            eventAddress: organizerdata[pIndex].event![eIndex].address,
+                            eventDates: organizerdata[pIndex].event![eIndex].eventDateTime,
+                            eventPrice: organizerdata[pIndex].event![eIndex].price,
+                            eventTitle: organizerdata[pIndex].event![eIndex].title,
+                            imageUrl: organizerdata[pIndex].event![eIndex].imageUrl,
                           );
                         },
                       ),
@@ -112,6 +63,78 @@ class PublisherListPage extends StatelessWidget {
                 ),
               );
             }));
+  }
+}
+
+class EventInfoCard extends StatelessWidget {
+  EventInfoCard(
+      {super.key,
+      required this.eventAddress,
+      required this.eventDates,
+      required this.eventPrice,
+      required this.eventTitle,
+      required this.imageUrl});
+
+  String? imageUrl;
+  String? eventTitle;
+  List<Address>? eventAddress;
+  List<DateTime>? eventDates;
+  double? eventPrice;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.5,
+          child: Card(
+            semanticContainer: true,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            child: Column(
+              children: [
+                //Event Image
+                Container(
+                  height: 100,
+                  decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(imageUrl!), fit: BoxFit.cover)),
+                ),
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(eventTitle!, style: Theme.of(context).textTheme.bodyLarge),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      //Adress Icon+text
+                      InfoIconText(
+                        text: "${eventAddress![0].city}",
+                        icon: Icons.location_pin,
+                      ),
+                      const SizedBox(height: 5),
+
+                      //Adress Icon+Date
+                      Row(
+                        children: [const Icon(Icons.date_range_outlined), Text(eventDates!.first.day.toString())],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [const Icon(Icons.attach_money), Text(eventPrice.toString())],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        )
+      ],
+    );
   }
 }
 
