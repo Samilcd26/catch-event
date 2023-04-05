@@ -1,6 +1,6 @@
 import 'package:vexana/vexana.dart';
 
-import '../../../Data/Models/publisher_model.dart';
+import '../../../Data/Models/organizer_model.dart';
 import '../../../Data/Models/user_model.dart';
 import '../IAccountService.dart';
 
@@ -10,7 +10,7 @@ class AccountService extends IAccountService {
   final String baseUrl = "http://192.168.1.105:8099/api/v1";
 
   @override
-  Future<UserModel?> getUserById(String id) async {
+  Future<UserModel?> getUserById(int id) async {
     final response =
         await networkManager.send<UserModel, UserModel>('$baseUrl/user/find?id=$id', parseModel: UserModel(), method: RequestType.GET);
 
@@ -18,9 +18,9 @@ class AccountService extends IAccountService {
   }
 
   @override
-  Future<List<PublisherModel>?> getFollowPublishers(List<String> idList) async {
-    final response = await networkManager.send<PublisherModel, List<PublisherModel>>('$baseUrl/user/follows',
-        parseModel: PublisherModel(), method: RequestType.POST, data: idList);
+  Future<List<OrganizerModel>?> getFollowOrganizers(List<int> idList) async {
+    final response = await networkManager.send<OrganizerModel, List<OrganizerModel>>('$baseUrl/user/getFollowers',
+        parseModel: OrganizerModel(), method: RequestType.GET, data: idList);
 
     return response.data;
   }

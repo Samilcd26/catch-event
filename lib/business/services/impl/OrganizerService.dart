@@ -2,11 +2,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:vexana/vexana.dart';
 
 import '../../../Data/Models/distance_model.dart';
-import '../../../Data/Models/publisher_model.dart';
-import '../IPublisherService.dart';
+import '../../../Data/Models/organizer_model.dart';
+import '../IOrganizerService.dart';
 
-class PublisherService extends IPublisherService {
-  PublisherService(INetworkManager networkManager) : super(networkManager);
+class OrganizerService extends IOrganizerService {
+  OrganizerService(INetworkManager networkManager) : super(networkManager);
   final String baseUrl = "http://192.168.1.105:8099/api/v1";
   final String apiKey = "AIzaSyAQZ-vxDLx856vCV38MFiWJhUIN_qmeS4k";
 
@@ -46,19 +46,29 @@ class PublisherService extends IPublisherService {
   }
 
   @override
-  Future<List<PublisherModel>?> getPubliscerByCity(String city) async {
-    final response = await networkManager.send<PublisherModel, List<PublisherModel>>('$baseUrl/publisher/all?city=$city',
-        parseModel: PublisherModel(), method: RequestType.GET);
+  Future<List<OrganizerModel>?> getOrganizerByCity(String city, String country, int userId) async {
+    final response = await networkManager.send<OrganizerModel, List<OrganizerModel>>(
+        '$baseUrl/organizer/allDataByCity?city=$city&country=$country&userId=$userId',
+        parseModel: OrganizerModel(),
+        method: RequestType.GET);
 
     return response.data;
   }
 
   @override
-  Future<List<PublisherModel>?> searchPublisher(String publisherName) async {
-    final response = await networkManager.send<PublisherModel, List<PublisherModel>>(
-        '$baseUrl/publisher/search?publisherName=$publisherName',
-        parseModel: PublisherModel(),
+  Future<List<OrganizerModel>?> searchOrganizer(String organizerName) async {
+    final response = await networkManager.send<OrganizerModel, List<OrganizerModel>>(
+        '$baseUrl/organizer/search?organizerName=$organizerName',
+        parseModel: OrganizerModel(),
         method: RequestType.GET);
+
+    return response.data;
+  }
+
+  @override
+  Future<OrganizerModel?> getOrganizerById(int organizerId) async {
+    final response = await networkManager.send<OrganizerModel, OrganizerModel>('$baseUrl/organizer/getDataById?organizerId=$organizerId',
+        parseModel: OrganizerModel(), method: RequestType.GET);
 
     return response.data;
   }

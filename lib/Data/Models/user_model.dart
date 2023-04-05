@@ -5,17 +5,19 @@ part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel extends INetworkModel<UserModel> {
-  String? id;
+  int? id;
   String? firstName;
   String? lastName;
   String? birtDate;
   String? email;
+  List<int>? byOrganized;
   String? imageURL;
-  List<String>? likeList;
+  List<int>? likeList;
+  List<int>? followOrganizer;
+  List<int>? userEventStore;
   String? role;
-  List<TicketList>? ticketList;
-  List<String>? flowPublisher;
-  bool? publisher;
+  List<String>? ticketList;
+  bool? organizer;
 
   UserModel(
       {this.id,
@@ -23,12 +25,14 @@ class UserModel extends INetworkModel<UserModel> {
       this.lastName,
       this.birtDate,
       this.email,
+      this.byOrganized,
       this.imageURL,
       this.likeList,
+      this.followOrganizer,
+      this.userEventStore,
       this.role,
       this.ticketList,
-      this.flowPublisher,
-      this.publisher});
+      this.organizer});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return _$UserModelFromJson(json);
@@ -45,21 +49,23 @@ class UserModel extends INetworkModel<UserModel> {
 }
 
 @JsonSerializable()
-class TicketList {
+class TicketModel {
   String? id;
   String? name;
+  String? imageUrl;
   String? description;
   String? createdDate;
+  String? changedDate;
   String? status;
-  String? token;
+  int? price;
 
-  TicketList({this.id, this.name, this.description, this.createdDate, this.status, this.token});
+  TicketModel({this.id, this.name, this.imageUrl, this.description, this.createdDate, this.changedDate, this.status, this.price});
 
-  factory TicketList.fromJson(Map<String, dynamic> json) {
-    return _$TicketListFromJson(json);
+  factory TicketModel.fromJson(Map<String, dynamic> json) {
+    return _$TicketModelFromJson(json);
   }
 
   Map<String, dynamic> toJson() {
-    return _$TicketListToJson(this);
+    return _$TicketModelToJson(this);
   }
 }

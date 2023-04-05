@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
+import '../Data/State/account_cubit.dart';
 import '../Data/State/root_cubit.dart';
 import '../business/services/impl/AccountService.dart';
-import '../business/services/impl/PublisherService.dart';
+import '../business/services/impl/OrganizerService.dart';
 import '../core/product/navigator/app_router.dart';
 import '../core/product/services/network_service.dart';
 
@@ -15,6 +16,9 @@ class RootPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool visible = false;
+
+    context.read<AccountCubit>().loadingUserData();
+
     return AutoTabsRouter.tabBar(
       physics: NeverScrollableScrollPhysics(),
       routes: [const HomeRoute(), const DiscoveryRoute(), AddEventRoute(), const TicketRoute(), const UserRoute()],
@@ -23,7 +27,7 @@ class RootPage extends StatelessWidget {
         return Scaffold(
           body: BlocProvider(
             create: (context) => RootCubit(
-                publisherService: PublisherService(NetworkService.instance.networkManager),
+                organizerService: OrganizerService(NetworkService.instance.networkManager),
                 accoundService: AccountService(NetworkService.instance.networkManager)),
             child: child,
           ),

@@ -1,32 +1,42 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../business/services/IAccountService.dart';
-import '../../business/services/IPublisherService.dart';
-import '../Models/publisher_model.dart';
+import '../../business/services/IOrganizerService.dart';
+import '../Models/organizer_model.dart';
 import '../Models/user_model.dart';
 
 class RootCubit extends Cubit<RootState> {
-  final IPublisherService publisherService;
+  final IOrganizerService organizerService;
   final IAccountService accoundService;
   //
-  List<PublisherModel> publisherData = [];
+  List<OrganizerModel> organizerData = [];
+  List<Event>? events = [];
   LatLng? cordinate;
   bool isLoading = false;
-  final String userId = "fcb62289-88bb-4f77-9f15-0d96a15824d3";
+  final int userId = 1;
   UserModel? currentUser = UserModel();
-  List<PublisherModel>? followPublisherList = [];
+  List<OrganizerModel>? followOrganizerList = [];
 //
-  RootCubit({required this.publisherService, required this.accoundService}) : super(RootInitial());
+  RootCubit({required this.organizerService, required this.accoundService}) : super(RootInitial());
 
-  List<PublisherModel>? searchList = [];
+  List<OrganizerModel>? searchList = [];
 
-  Future<void> _getAllPublisherByCity() async {
-    final data = await publisherService.getPubliscerByCity("Eskişehir");
+  Future<void> _getAllOrganizerByCity() async {
+    final data = await organizerService.getOrganizerByCity("Eskişehir", "Türkiye", currentUser!.id!);
 
-    publisherData = data!;
-    // emit(SuccesPublisherData(data));
+    organizerData = data!;
+    // emit(SuccesOrganizerData(data));
+  }
+
+  Future<void> _getAllEvent() async {
+    events!.clear();
+    Future.wait(organizerData.expand((org) => org.event!.map((ev) async => events!.add(ev))));
+
+    inspect(events);
   }
 
   void _changeLoadingStatus() {
@@ -37,31 +47,34 @@ class RootCubit extends Cubit<RootState> {
   Future<void> _getUserById() async {
     final data = await accoundService.getUserById(userId);
     currentUser = data;
-    // emit(SuccesPublisherData(data));
+    // emit(SuccesOrganizerData(data));
   }
 
   Future<void> _getCurrentLocation() async {
-    final data = await publisherService.getCurrentLocation();
+    final data = await organizerService.getCurrentLocation();
 
     cordinate = LatLng(data.latitude, data.longitude);
     //emit(SuccesCurrentPosition(data));
   }
 
-  Future<void> _getFollowPublishers() async {
-    final data = await accoundService.getFollowPublishers(currentUser!.flowPublisher!);
-    followPublisherList = data;
+  Future<void> _getFollowOrganizers() async {
+    if (currentUser!.followOrganizer != null) {
+      final data = await accoundService.getFollowOrganizers(currentUser!.followOrganizer!);
+      followOrganizerList = data;
+    }
   }
 
-  Future<void> searchPublisher(String publisherName) async {
-    final data = await publisherService.searchPublisher(publisherName);
+  Future<void> searchOrganizer(String organizerName) async {
+    final data = await organizerService.searchOrganizer(organizerName);
     searchList = data!;
   }
 
   Future<void> loadingInitData() async {
     await _getUserById();
     await _getCurrentLocation();
-    await _getAllPublisherByCity();
-    await _getFollowPublishers();
+    await _getAllOrganizerByCity();
+    await _getFollowOrganizers();
+    await _getAllEvent();
     isLoading ? "" : _changeLoadingStatus();
   }
 }
@@ -70,10 +83,10 @@ abstract class RootState {}
 
 class RootInitial extends RootState {}
 
-class SuccesPublisherData extends RootState {
-  final List<PublisherModel> model;
+class SuccesOrganizerData extends RootState {
+  final List<OrganizerModel> model;
 
-  SuccesPublisherData(this.model);
+  SuccesOrganizerData(this.model);
 }
 
 class SuccesCurrentPosition extends RootState {

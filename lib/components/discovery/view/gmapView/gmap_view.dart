@@ -8,23 +8,23 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../../Data/Models/category_model.dart';
-import '../../../../Data/Models/publisher_model.dart';
+import '../../../../Data/Models/organizer_model.dart';
 import '../../../../core/product/helper/dividers.dart';
 import '../../../../core/product/helper/elevated_button.dart';
 import '../../../../core/product/helper/loading_animation.dart';
 import '../listView/list_view.dart';
 
-class PublisherMapPage extends StatefulWidget {
-  PublisherMapPage({super.key, required this.publisherdata, required this.currentPosition});
+class OrganizerMapPage extends StatefulWidget {
+  OrganizerMapPage({super.key, required this.organizerdata, required this.currentPosition});
 
-  late final List<PublisherModel> publisherdata;
+  late final List<OrganizerModel> organizerdata;
   LatLng? currentPosition;
-  //final GmapViewModel gmapViewModel = GmapViewModel(PublisherService(NetworkService.instance.networkManager));
+  //final GmapViewModel gmapViewModel = GmapViewModel(OrganizerService(NetworkService.instance.networkManager));
   @override
-  State<PublisherMapPage> createState() => _PublisherMapPageState();
+  State<OrganizerMapPage> createState() => _OrganizerMapPageState();
 }
 
-class _PublisherMapPageState extends State<PublisherMapPage> {
+class _OrganizerMapPageState extends State<OrganizerMapPage> {
   List<Marker> _markerList = [];
   bool isLoading = false;
   ////////////////////////////////
@@ -113,8 +113,8 @@ class _PublisherMapPageState extends State<PublisherMapPage> {
   loadingMarkerData() async {
     List emty = [];
     Uint8List customMarker;
-    await Future.wait(widget.publisherdata.map((publisherElement) async => {
-          Future.wait(publisherElement.event!.map((eventItem) async => {
+    await Future.wait(widget.organizerdata.map((organizerElement) async => {
+          Future.wait(organizerElement.event!.map((eventItem) async => {
                 Future.wait(eventItem.address!.map((eventAdress) async => {
                       customMarker = await getBytesFromAsset(eventItem.category.toString(), 150),
                       //
@@ -136,7 +136,7 @@ class _PublisherMapPageState extends State<PublisherMapPage> {
                                   Container(
                                     height: MediaQuery.of(context).size.height * 0.2,
                                     decoration: BoxDecoration(
-                                        image: DecorationImage(image: NetworkImage(eventItem.image.toString()), fit: BoxFit.cover)),
+                                        image: DecorationImage(image: NetworkImage(eventItem.imageUrl.toString()), fit: BoxFit.cover)),
                                     child: Column(mainAxisAlignment: MainAxisAlignment.start, children: const [
                                       //Divider
                                       CustomDivider()
@@ -165,7 +165,7 @@ class _PublisherMapPageState extends State<PublisherMapPage> {
                                   ListTile(
                                     title: Text('Etkinlik Detayı'),
                                     subtitle: ReadMoreText(
-                                      eventItem.description.toString(),
+                                      eventItem.shortDescription.toString(),
                                       trimLines: 1,
                                     ),
                                   )
@@ -242,7 +242,7 @@ class _PublisherMapPageState extends State<PublisherMapPage> {
   }
 }
 
-enum PublisherCategories {
+enum OrganizerCategories {
   FOOD,
   CULTURAL,
   TOURISTY,
@@ -257,13 +257,13 @@ enum PublisherCategories {
 }
 
 List<CategoryModel> allCategoryList = [
-  CategoryModel(PublisherCategories.FOOD.name, Icons.lunch_dining_rounded, false, Colors.amber),
-  CategoryModel(PublisherCategories.CULTURAL.name, Icons.theater_comedy_rounded, false, Colors.purple),
-  CategoryModel(PublisherCategories.TOURISTY.name, Icons.beach_access, false, Colors.blueGrey),
-  CategoryModel(PublisherCategories.SHOOP.name, Icons.shopping_bag_rounded, false, Colors.cyan),
-  CategoryModel(PublisherCategories.CHARITABLE.name, Icons.handshake_rounded, false, Colors.red),
-  CategoryModel(PublisherCategories.COMPETITION.name, Icons.emoji_events_rounded, false, Colors.blueAccent),
-  CategoryModel(PublisherCategories.RELIGIOUS.name, Icons.mosque_rounded, false, Colors.black54),
+  CategoryModel(OrganizerCategories.FOOD.name, Icons.lunch_dining_rounded, false, Colors.amber),
+  CategoryModel(OrganizerCategories.CULTURAL.name, Icons.theater_comedy_rounded, false, Colors.purple),
+  CategoryModel(OrganizerCategories.TOURISTY.name, Icons.beach_access, false, Colors.blueGrey),
+  CategoryModel(OrganizerCategories.SHOOP.name, Icons.shopping_bag_rounded, false, Colors.cyan),
+  CategoryModel(OrganizerCategories.CHARITABLE.name, Icons.handshake_rounded, false, Colors.red),
+  CategoryModel(OrganizerCategories.COMPETITION.name, Icons.emoji_events_rounded, false, Colors.blueAccent),
+  CategoryModel(OrganizerCategories.RELIGIOUS.name, Icons.mosque_rounded, false, Colors.black54),
 ];
 
 List<CategoryModel> selectedCategory = [];

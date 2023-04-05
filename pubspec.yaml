@@ -26,6 +26,7 @@ dependencies:
   barcode: ^2.2.3
   barcode_widget: ^2.0.3
   bloc: ^8.1.1
+  carousel_slider: ^4.2.1
   cupertino_icons: ^1.0.5
   dotted_line: ^3.1.0
   flutter:
@@ -42,6 +43,7 @@ dependencies:
   json_serializable: ^6.6.1
   loading_animation_widget: ^1.2.0+4
   readmore: ^2.2.0
+  share_plus: ^6.3.1
   ticket_widget: ^0.0.1
   uuid: ^3.0.7
   vexana: ^3.4.1

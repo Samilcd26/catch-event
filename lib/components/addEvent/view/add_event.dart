@@ -26,7 +26,7 @@ class _AddEventPageState extends State<AddEventPage> {
             Row(children: const [
               Expanded(
                 child: //Titles
-                    ITextField(
+                    ILableTextField(
                   labelText: "Title",
                 ),
               ),
@@ -34,14 +34,14 @@ class _AddEventPageState extends State<AddEventPage> {
               //Price
               Expanded(
                 child: //Price
-                    ITextField(
+                    ILableTextField(
                   labelText: "Price",
                 ),
               )
             ]),
             const SizedBox(height: 10),
             //Description
-            const ITextField(
+            const ILableTextField(
               labelText: "Description",
               maxLine: 4,
               textInputType: TextInputType.multiline,
@@ -50,7 +50,7 @@ class _AddEventPageState extends State<AddEventPage> {
             Row(
               children: [
                 Expanded(
-                  child: ITextField(
+                  child: ILableTextField(
                     labelText: "Date",
                     textInputType: TextInputType.datetime,
                     icon: IconButton(onPressed: () {}, icon: const Icon(Icons.date_range)),
@@ -58,7 +58,7 @@ class _AddEventPageState extends State<AddEventPage> {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: ITextField(
+                  child: ILableTextField(
                     labelText: "Hourse",
                     textInputType: TextInputType.datetime,
                     icon: IconButton(onPressed: () {}, icon: const Icon(Icons.more_time_sharp)),

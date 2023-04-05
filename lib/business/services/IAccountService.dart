@@ -1,6 +1,6 @@
 import 'package:vexana/vexana.dart';
 
-import '../../Data/Models/publisher_model.dart';
+import '../../Data/Models/organizer_model.dart';
 import '../../Data/Models/user_model.dart';
 
 abstract class IAccountService {
@@ -9,7 +9,7 @@ abstract class IAccountService {
 
   bool isLoading = false;
 
-  //Get Publisher by city name
-  Future<UserModel?> getUserById(String id);
-  Future<List<PublisherModel>?> getFollowPublishers(List<String> idList);
+  //Get Organizer by city name
+  Future<UserModel?> getUserById(int id);
+  Future<List<OrganizerModel>?> getFollowOrganizers(List<int> idList);
 }

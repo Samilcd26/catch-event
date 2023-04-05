@@ -25,13 +25,29 @@ class _$AppRouter extends RootStackRouter {
         child: RootPage(key: args.key),
       );
     },
-    PublisherInfoRoute.name: (routeData) {
-      final args = routeData.argsAs<PublisherInfoRouteArgs>();
+    FilterRoute.name: (routeData) {
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: PublisherInfoPage(
+        child: const FilterPage(),
+      );
+    },
+    OrganizerInfoRoute.name: (routeData) {
+      final args = routeData.argsAs<OrganizerInfoRouteArgs>();
+      return MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: OrganizerInfoPage(
           key: args.key,
-          publisherModel: args.publisherModel,
+          organizerModel: args.organizerModel,
+        ),
+      );
+    },
+    EventInfoRoute.name: (routeData) {
+      final args = routeData.argsAs<EventInfoRouteArgs>();
+      return MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: EventInfoPage(
+          key: args.key,
+          event: args.event,
         ),
       );
     },
@@ -67,24 +83,24 @@ class _$AppRouter extends RootStackRouter {
         child: const UserPage(),
       );
     },
-    PublisherMapRoute.name: (routeData) {
-      final args = routeData.argsAs<PublisherMapRouteArgs>();
+    OrganizerMapRoute.name: (routeData) {
+      final args = routeData.argsAs<OrganizerMapRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: PublisherMapPage(
+        child: OrganizerMapPage(
           key: args.key,
-          publisherdata: args.publisherdata,
+          organizerdata: args.organizerdata,
           currentPosition: args.currentPosition,
         ),
       );
     },
-    PublisherListRoute.name: (routeData) {
-      final args = routeData.argsAs<PublisherListRouteArgs>();
+    OrganizerListRoute.name: (routeData) {
+      final args = routeData.argsAs<OrganizerListRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: PublisherListPage(
+        child: OrganizerListPage(
           key: args.key,
-          publisherdata: args.publisherdata,
+          organizerdata: args.organizerdata,
         ),
       );
     },
@@ -113,13 +129,13 @@ class _$AppRouter extends RootStackRouter {
               parent: RootRoute.name,
               children: [
                 RouteConfig(
-                  PublisherMapRoute.name,
-                  path: 'publisher-map-page',
+                  OrganizerMapRoute.name,
+                  path: 'organizer-map-page',
                   parent: DiscoveryRoute.name,
                 ),
                 RouteConfig(
-                  PublisherListRoute.name,
-                  path: 'publisher-list-page',
+                  OrganizerListRoute.name,
+                  path: 'organizer-list-page',
                   parent: DiscoveryRoute.name,
                 ),
               ],
@@ -142,8 +158,16 @@ class _$AppRouter extends RootStackRouter {
           ],
         ),
         RouteConfig(
-          PublisherInfoRoute.name,
-          path: '/publisher-info-page',
+          FilterRoute.name,
+          path: '/filter-page',
+        ),
+        RouteConfig(
+          OrganizerInfoRoute.name,
+          path: '/organizer-info-page',
+        ),
+        RouteConfig(
+          EventInfoRoute.name,
+          path: '/event-info-page',
         ),
       ];
 }
@@ -176,36 +200,82 @@ class RootRouteArgs {
 }
 
 /// generated route for
-/// [PublisherInfoPage]
-class PublisherInfoRoute extends PageRouteInfo<PublisherInfoRouteArgs> {
-  PublisherInfoRoute({
+/// [FilterPage]
+class FilterRoute extends PageRouteInfo<void> {
+  const FilterRoute()
+      : super(
+          FilterRoute.name,
+          path: '/filter-page',
+        );
+
+  static const String name = 'FilterRoute';
+}
+
+/// generated route for
+/// [OrganizerInfoPage]
+class OrganizerInfoRoute extends PageRouteInfo<OrganizerInfoRouteArgs> {
+  OrganizerInfoRoute({
     Key? key,
-    required PublisherModel publisherModel,
+    required OrganizerModel organizerModel,
   }) : super(
-          PublisherInfoRoute.name,
-          path: '/publisher-info-page',
-          args: PublisherInfoRouteArgs(
+          OrganizerInfoRoute.name,
+          path: '/organizer-info-page',
+          args: OrganizerInfoRouteArgs(
             key: key,
-            publisherModel: publisherModel,
+            organizerModel: organizerModel,
           ),
         );
 
-  static const String name = 'PublisherInfoRoute';
+  static const String name = 'OrganizerInfoRoute';
 }
 
-class PublisherInfoRouteArgs {
-  const PublisherInfoRouteArgs({
+class OrganizerInfoRouteArgs {
+  const OrganizerInfoRouteArgs({
     this.key,
-    required this.publisherModel,
+    required this.organizerModel,
   });
 
   final Key? key;
 
-  final PublisherModel publisherModel;
+  final OrganizerModel organizerModel;
 
   @override
   String toString() {
-    return 'PublisherInfoRouteArgs{key: $key, publisherModel: $publisherModel}';
+    return 'OrganizerInfoRouteArgs{key: $key, organizerModel: $organizerModel}';
+  }
+}
+
+/// generated route for
+/// [EventInfoPage]
+class EventInfoRoute extends PageRouteInfo<EventInfoRouteArgs> {
+  EventInfoRoute({
+    Key? key,
+    required Event? event,
+  }) : super(
+          EventInfoRoute.name,
+          path: '/event-info-page',
+          args: EventInfoRouteArgs(
+            key: key,
+            event: event,
+          ),
+        );
+
+  static const String name = 'EventInfoRoute';
+}
+
+class EventInfoRouteArgs {
+  const EventInfoRouteArgs({
+    this.key,
+    required this.event,
+  });
+
+  final Key? key;
+
+  final Event? event;
+
+  @override
+  String toString() {
+    return 'EventInfoRouteArgs{key: $key, event: $event}';
   }
 }
 
@@ -283,74 +353,74 @@ class UserRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [PublisherMapPage]
-class PublisherMapRoute extends PageRouteInfo<PublisherMapRouteArgs> {
-  PublisherMapRoute({
+/// [OrganizerMapPage]
+class OrganizerMapRoute extends PageRouteInfo<OrganizerMapRouteArgs> {
+  OrganizerMapRoute({
     Key? key,
-    required List<PublisherModel> publisherdata,
+    required List<OrganizerModel> organizerdata,
     required LatLng? currentPosition,
   }) : super(
-          PublisherMapRoute.name,
-          path: 'publisher-map-page',
-          args: PublisherMapRouteArgs(
+          OrganizerMapRoute.name,
+          path: 'organizer-map-page',
+          args: OrganizerMapRouteArgs(
             key: key,
-            publisherdata: publisherdata,
+            organizerdata: organizerdata,
             currentPosition: currentPosition,
           ),
         );
 
-  static const String name = 'PublisherMapRoute';
+  static const String name = 'OrganizerMapRoute';
 }
 
-class PublisherMapRouteArgs {
-  const PublisherMapRouteArgs({
+class OrganizerMapRouteArgs {
+  const OrganizerMapRouteArgs({
     this.key,
-    required this.publisherdata,
+    required this.organizerdata,
     required this.currentPosition,
   });
 
   final Key? key;
 
-  final List<PublisherModel> publisherdata;
+  final List<OrganizerModel> organizerdata;
 
   final LatLng? currentPosition;
 
   @override
   String toString() {
-    return 'PublisherMapRouteArgs{key: $key, publisherdata: $publisherdata, currentPosition: $currentPosition}';
+    return 'OrganizerMapRouteArgs{key: $key, organizerdata: $organizerdata, currentPosition: $currentPosition}';
   }
 }
 
 /// generated route for
-/// [PublisherListPage]
-class PublisherListRoute extends PageRouteInfo<PublisherListRouteArgs> {
-  PublisherListRoute({
+/// [OrganizerListPage]
+class OrganizerListRoute extends PageRouteInfo<OrganizerListRouteArgs> {
+  OrganizerListRoute({
     Key? key,
-    required List<PublisherModel> publisherdata,
+    required List<OrganizerModel> organizerdata,
   }) : super(
-          PublisherListRoute.name,
-          path: 'publisher-list-page',
-          args: PublisherListRouteArgs(
+          OrganizerListRoute.name,
+          path: 'organizer-list-page',
+          args: OrganizerListRouteArgs(
             key: key,
-            publisherdata: publisherdata,
+            organizerdata: organizerdata,
           ),
         );
 
-  static const String name = 'PublisherListRoute';
+  static const String name = 'OrganizerListRoute';
 }
 
-class PublisherListRouteArgs {
-  const PublisherListRouteArgs({
+class OrganizerListRouteArgs {
+  const OrganizerListRouteArgs({
     this.key,
-    required this.publisherdata,
+    required this.organizerdata,
   });
 
   final Key? key;
 
-  final List<PublisherModel> publisherdata;
+  final List<OrganizerModel> organizerdata;
 
   @override
   String toString() {
-    return 'PublisherListRouteArgs{key: $key, publisherdata: $publisherdata}';
+    return 'OrganizerListRouteArgs{key: $key, organizerdata: $organizerdata}';
   }
 }
