@@ -1,24 +1,17 @@
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ticket_widget/ticket_widget.dart';
 
 import '../../../Data/State/root_cubit.dart';
 import '../../../core/product/helper/loading_animation.dart';
 
 class TicketPage extends StatelessWidget {
-  const TicketPage({super.key});
+  const TicketPage({super.key, required this.parentContex});
+  final BuildContext parentContex;
 
   @override
   Widget build(BuildContext context) {
-    context.read<RootCubit>().loadingInitData();
-    final dm = Barcode.dataMatrix();
-
-// Generate a SVG with "Hello World!"
-    final svg = dm.toSvg('Hello World!', width: 200, height: 200);
-
-    return context.watch<RootCubit>().isLoading
+    return parentContex.watch<RootCubit>().isLoading
         ? SafeArea(
             child: Scaffold(
               backgroundColor: Colors.grey.shade300,
@@ -45,32 +38,62 @@ class TicketPage extends StatelessWidget {
   }
 }
 
+final dm = Barcode.dataMatrix();
+
 class _ticketWidget extends StatelessWidget {
-  const _ticketWidget({
+  _ticketWidget({
     super.key,
   });
 
+// Generate a SVG with "Hello World!"
+
   @override
   Widget build(BuildContext context) {
-    return TicketWidget(
-        width: MediaQuery.of(context).size.width * 0.4,
-        height: MediaQuery.of(context).size.height * 0.3,
-        isCornerRounded: true,
-        padding: EdgeInsets.all(20),
-        child: Center(
+    return Card(
+        child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    fit: BoxFit.cover, image: NetworkImage("https://cdn.pixabay.com/photo/2016/09/08/18/45/cube-1655118_960_720.jpg"))),
             child: Column(
-          children: [
-            Text("Title", style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 10),
-            const Text("Slogan"),
-            const SizedBox(height: 40),
-            const DottedLine(lineThickness: 3),
-            const SizedBox(height: 20),
-            const _infoCardWidget(title: "22:30", subTitle: "Saat"),
-            const SizedBox(height: 10),
-            const _infoCardWidget(title: "06/04/2023", subTitle: "Tarih")
-          ],
-        )));
+              children: [
+                Text("Title", style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(height: 10),
+                const Text("Slogan"),
+                const SizedBox(height: 10),
+                const _infoCardWidget(title: "22:30", subTitle: "Saat"),
+                const SizedBox(height: 10),
+                const _infoCardWidget(title: "06/04/2023", subTitle: "Tarih")
+              ],
+            ),
+          ),
+        ),
+
+        //Barkod resmini büyüt büyüt
+        Expanded(
+            flex: 1,
+            child: InkWell(
+              onTap: () {},
+              child: Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: BarcodeWidget(
+                    width: 50,
+                    height: 150,
+                    barcode: Barcode.qrCode(),
+                    data: 'Hello Flutter',
+                  ),
+                ),
+              ),
+            ))
+      ],
+    ));
   }
 }
 

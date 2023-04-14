@@ -8,39 +8,57 @@ class SSFLCubit extends Cubit<SSFLState> {
   SSFLCubit({required this.ssflService}) : super(SSFLInitial());
   List<CommentModel> commentsList = [];
 
-  void followOrganizer(int userId, int organizerId) {
-    ssflService.followOrganizer(userId, organizerId);
+  Future<bool> followOrganizer(int userId, int organizerId) async {
+    var res = await ssflService.followOrganizer(userId, organizerId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void unfollowOrganizer(int userId, int organizerId) {
-    ssflService.unfollowOrganizer(userId, organizerId);
+  Future<bool> unfollowOrganizer(int userId, int organizerId) async {
+    var res = await ssflService.unfollowOrganizer(userId, organizerId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void addLikeToEvent(int userId, int eventId) {
-    ssflService.addLikeToEvent(userId, eventId);
+  Future<bool> addLikeToEvent(int userId, int eventId) async {
+    var res = await ssflService.addLikeToEvent(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void unlikeEvent(int userId, int eventId) {
-    ssflService.removelikeEvent(userId, eventId);
+  Future<bool> removeLikeEvent(int userId, int eventId) async {
+    var res = await ssflService.removelikeEvent(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void saveOrganizerEventToUserStore(int userId, int eventId) {
-    ssflService.saveOrganizerEventToUserStore(userId, eventId);
+  Future<bool> addDislikeToEvent(int userId, int eventId) async {
+    var res = await ssflService.addDislikeToEvent(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void removeOrganizerEventToUserStore(int userId, int eventId) {
-    ssflService.removeOrganizerEventToUserStore(userId, eventId);
+  Future<bool> removeDislikeEvent(int userId, int eventId) async {
+    var res = await ssflService.removeDislikeEvent(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void addCommentToEvent(int userId, int eventId, CommentModel comment) {
-    ssflService.addCommentToEvent(userId, eventId, comment);
+  Future<bool> saveOrganizerEventToUserStore(int userId, int eventId) async {
+    var res = await ssflService.saveOrganizerEventToUserStore(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void removeCommentToEvent(int userId, int eventId, int commentId) {
-    ssflService.removeCommentToEvent(userId, eventId, commentId);
+  Future<bool> removeOrganizerEventToUserStore(int userId, int eventId) async {
+    var res = await ssflService.removeOrganizerEventToUserStore(userId, eventId);
+    return res.statusCode == 200 ? true : false;
   }
 
-  void getCommentList(List<int>? commentIdList) async {
+  Future<bool> addCommentToEvent(int userId, int eventId, CommentModel comment) async {
+    var res = await ssflService.addCommentToEvent(userId, eventId, comment);
+    return res.statusCode == 200 ? true : false;
+  }
+
+  Future<bool> removeCommentToEvent(int userId, int eventId, int commentId) async {
+    var res = await ssflService.removeCommentToEvent(userId, eventId, commentId);
+    return res.statusCode == 200 ? true : false;
+  }
+
+  Future<void> getCommentList(List<int>? commentIdList) async {
     final data = await ssflService.getCommentList(commentIdList);
     commentsList = data;
   }

@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:vexana/vexana.dart';
 
 import '../../../Data/Models/distance_model.dart';
+import '../../../Data/Models/filter_organizer_model.dart';
 import '../../../Data/Models/organizer_model.dart';
 import '../IOrganizerService.dart';
 
@@ -46,13 +50,25 @@ class OrganizerService extends IOrganizerService {
   }
 
   @override
-  Future<List<OrganizerModel>?> getOrganizerByCity(String city, String country, int userId) async {
-    final response = await networkManager.send<OrganizerModel, List<OrganizerModel>>(
-        '$baseUrl/organizer/allDataByCity?city=$city&country=$country&userId=$userId',
-        parseModel: OrganizerModel(),
-        method: RequestType.GET);
+  Future<List<OrganizerModel>?> getOrganizerByFilter(FilterOrganizerModel filter) async {
+    final response = await http.post(Uri.parse('$baseUrl/organizer/allDataByFilter'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(filter.toJson()));
 
-    return response.data;
+    if (response.statusCode == 200) {
+      List<OrganizerModel> organizerList = [];
+      List jsonResponse = json.decode(response.body);
+
+      await Future.wait(jsonResponse.map((e) async => organizerList.add(OrganizerModel.fromJson(e))));
+
+      return organizerList;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
   }
 
   @override
@@ -71,5 +87,15 @@ class OrganizerService extends IOrganizerService {
         parseModel: OrganizerModel(), method: RequestType.GET);
 
     return response.data;
+  }
+
+  @override
+  Future<http.Response> createNewEvent(int organizerId, Event eventModel) async {
+    final response = await http.post(Uri.parse('$baseUrl/organizer/addEvent?organizerId=$organizerId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(eventModel.toJson()));
+    return response;
   }
 }

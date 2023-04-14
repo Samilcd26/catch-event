@@ -25,10 +25,24 @@ class _$AppRouter extends RootStackRouter {
         child: RootPage(key: args.key),
       );
     },
-    FilterRoute.name: (routeData) {
+    SearchLocationRoute.name: (routeData) {
+      final args = routeData.argsAs<SearchLocationRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const FilterPage(),
+        child: SearchLocationPage(
+          key: args.key,
+          isChangeCurrentLocation: args.isChangeCurrentLocation,
+        ),
+      );
+    },
+    FilterRoute.name: (routeData) {
+      final args = routeData.argsAs<FilterRouteArgs>();
+      return MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: FilterPage(
+          key: args.key,
+          parentContex: args.parentContex,
+        ),
       );
     },
     OrganizerInfoRoute.name: (routeData) {
@@ -52,35 +66,56 @@ class _$AppRouter extends RootStackRouter {
       );
     },
     HomeRoute.name: (routeData) {
+      final args = routeData.argsAs<HomeRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const HomePage(),
+        child: HomePage(
+          key: args.key,
+          parentContex: args.parentContex,
+        ),
       );
     },
     DiscoveryRoute.name: (routeData) {
+      final args = routeData.argsAs<DiscoveryRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const DiscoveryPage(),
+        child: DiscoveryPage(
+          key: args.key,
+          parentContex: args.parentContex,
+        ),
       );
     },
     AddEventRoute.name: (routeData) {
-      final args = routeData.argsAs<AddEventRouteArgs>(
-          orElse: () => const AddEventRouteArgs());
+      final args = routeData.argsAs<AddEventRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: AddEventPage(key: args.key),
+        child: AddEventPage(
+          key: args.key,
+          currentUser: args.currentUser,
+          currentOrganizer: args.currentOrganizer,
+          parentContex: args.parentContex,
+        ),
       );
     },
     TicketRoute.name: (routeData) {
+      final args = routeData.argsAs<TicketRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const TicketPage(),
+        child: TicketPage(
+          key: args.key,
+          parentContex: args.parentContex,
+        ),
       );
     },
     UserRoute.name: (routeData) {
+      final args = routeData.argsAs<UserRouteArgs>();
       return MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const UserPage(),
+        child: UserPage(
+          key: args.key,
+          currentUser: args.currentUser,
+          parentContex: args.parentContex,
+        ),
       );
     },
     OrganizerMapRoute.name: (routeData) {
@@ -90,7 +125,7 @@ class _$AppRouter extends RootStackRouter {
         child: OrganizerMapPage(
           key: args.key,
           organizerdata: args.organizerdata,
-          currentPosition: args.currentPosition,
+          parentContex: args.parentContex,
         ),
       );
     },
@@ -101,6 +136,7 @@ class _$AppRouter extends RootStackRouter {
         child: OrganizerListPage(
           key: args.key,
           organizerdata: args.organizerdata,
+          parentContex: args.parentContex,
         ),
       );
     },
@@ -158,6 +194,10 @@ class _$AppRouter extends RootStackRouter {
           ],
         ),
         RouteConfig(
+          SearchLocationRoute.name,
+          path: '/search-location-page',
+        ),
+        RouteConfig(
           FilterRoute.name,
           path: '/filter-page',
         ),
@@ -200,15 +240,71 @@ class RootRouteArgs {
 }
 
 /// generated route for
+/// [SearchLocationPage]
+class SearchLocationRoute extends PageRouteInfo<SearchLocationRouteArgs> {
+  SearchLocationRoute({
+    Key? key,
+    required bool isChangeCurrentLocation,
+  }) : super(
+          SearchLocationRoute.name,
+          path: '/search-location-page',
+          args: SearchLocationRouteArgs(
+            key: key,
+            isChangeCurrentLocation: isChangeCurrentLocation,
+          ),
+        );
+
+  static const String name = 'SearchLocationRoute';
+}
+
+class SearchLocationRouteArgs {
+  const SearchLocationRouteArgs({
+    this.key,
+    required this.isChangeCurrentLocation,
+  });
+
+  final Key? key;
+
+  final bool isChangeCurrentLocation;
+
+  @override
+  String toString() {
+    return 'SearchLocationRouteArgs{key: $key, isChangeCurrentLocation: $isChangeCurrentLocation}';
+  }
+}
+
+/// generated route for
 /// [FilterPage]
-class FilterRoute extends PageRouteInfo<void> {
-  const FilterRoute()
-      : super(
+class FilterRoute extends PageRouteInfo<FilterRouteArgs> {
+  FilterRoute({
+    Key? key,
+    required BuildContext parentContex,
+  }) : super(
           FilterRoute.name,
           path: '/filter-page',
+          args: FilterRouteArgs(
+            key: key,
+            parentContex: parentContex,
+          ),
         );
 
   static const String name = 'FilterRoute';
+}
+
+class FilterRouteArgs {
+  const FilterRouteArgs({
+    this.key,
+    required this.parentContex,
+  });
+
+  final Key? key;
+
+  final BuildContext parentContex;
+
+  @override
+  String toString() {
+    return 'FilterRouteArgs{key: $key, parentContex: $parentContex}';
+  }
 }
 
 /// generated route for
@@ -281,75 +377,189 @@ class EventInfoRouteArgs {
 
 /// generated route for
 /// [HomePage]
-class HomeRoute extends PageRouteInfo<void> {
-  const HomeRoute()
-      : super(
+class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
+  HomeRoute({
+    Key? key,
+    required BuildContext parentContex,
+  }) : super(
           HomeRoute.name,
           path: 'home-page',
+          args: HomeRouteArgs(
+            key: key,
+            parentContex: parentContex,
+          ),
         );
 
   static const String name = 'HomeRoute';
 }
 
+class HomeRouteArgs {
+  const HomeRouteArgs({
+    this.key,
+    required this.parentContex,
+  });
+
+  final Key? key;
+
+  final BuildContext parentContex;
+
+  @override
+  String toString() {
+    return 'HomeRouteArgs{key: $key, parentContex: $parentContex}';
+  }
+}
+
 /// generated route for
 /// [DiscoveryPage]
-class DiscoveryRoute extends PageRouteInfo<void> {
-  const DiscoveryRoute({List<PageRouteInfo>? children})
-      : super(
+class DiscoveryRoute extends PageRouteInfo<DiscoveryRouteArgs> {
+  DiscoveryRoute({
+    Key? key,
+    required BuildContext parentContex,
+    List<PageRouteInfo>? children,
+  }) : super(
           DiscoveryRoute.name,
           path: 'discovery-page',
+          args: DiscoveryRouteArgs(
+            key: key,
+            parentContex: parentContex,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'DiscoveryRoute';
 }
 
+class DiscoveryRouteArgs {
+  const DiscoveryRouteArgs({
+    this.key,
+    required this.parentContex,
+  });
+
+  final Key? key;
+
+  final BuildContext parentContex;
+
+  @override
+  String toString() {
+    return 'DiscoveryRouteArgs{key: $key, parentContex: $parentContex}';
+  }
+}
+
 /// generated route for
 /// [AddEventPage]
 class AddEventRoute extends PageRouteInfo<AddEventRouteArgs> {
-  AddEventRoute({Key? key})
-      : super(
+  AddEventRoute({
+    Key? key,
+    required UserModel? currentUser,
+    required OrganizerModel? currentOrganizer,
+    required BuildContext parentContex,
+  }) : super(
           AddEventRoute.name,
           path: 'add-event-page',
-          args: AddEventRouteArgs(key: key),
+          args: AddEventRouteArgs(
+            key: key,
+            currentUser: currentUser,
+            currentOrganizer: currentOrganizer,
+            parentContex: parentContex,
+          ),
         );
 
   static const String name = 'AddEventRoute';
 }
 
 class AddEventRouteArgs {
-  const AddEventRouteArgs({this.key});
+  const AddEventRouteArgs({
+    this.key,
+    required this.currentUser,
+    required this.currentOrganizer,
+    required this.parentContex,
+  });
 
   final Key? key;
 
+  final UserModel? currentUser;
+
+  final OrganizerModel? currentOrganizer;
+
+  final BuildContext parentContex;
+
   @override
   String toString() {
-    return 'AddEventRouteArgs{key: $key}';
+    return 'AddEventRouteArgs{key: $key, currentUser: $currentUser, currentOrganizer: $currentOrganizer, parentContex: $parentContex}';
   }
 }
 
 /// generated route for
 /// [TicketPage]
-class TicketRoute extends PageRouteInfo<void> {
-  const TicketRoute()
-      : super(
+class TicketRoute extends PageRouteInfo<TicketRouteArgs> {
+  TicketRoute({
+    Key? key,
+    required BuildContext parentContex,
+  }) : super(
           TicketRoute.name,
           path: 'ticket-page',
+          args: TicketRouteArgs(
+            key: key,
+            parentContex: parentContex,
+          ),
         );
 
   static const String name = 'TicketRoute';
 }
 
+class TicketRouteArgs {
+  const TicketRouteArgs({
+    this.key,
+    required this.parentContex,
+  });
+
+  final Key? key;
+
+  final BuildContext parentContex;
+
+  @override
+  String toString() {
+    return 'TicketRouteArgs{key: $key, parentContex: $parentContex}';
+  }
+}
+
 /// generated route for
 /// [UserPage]
-class UserRoute extends PageRouteInfo<void> {
-  const UserRoute()
-      : super(
+class UserRoute extends PageRouteInfo<UserRouteArgs> {
+  UserRoute({
+    Key? key,
+    required UserModel currentUser,
+    required BuildContext parentContex,
+  }) : super(
           UserRoute.name,
           path: 'user-page',
+          args: UserRouteArgs(
+            key: key,
+            currentUser: currentUser,
+            parentContex: parentContex,
+          ),
         );
 
   static const String name = 'UserRoute';
+}
+
+class UserRouteArgs {
+  const UserRouteArgs({
+    this.key,
+    required this.currentUser,
+    required this.parentContex,
+  });
+
+  final Key? key;
+
+  final UserModel currentUser;
+
+  final BuildContext parentContex;
+
+  @override
+  String toString() {
+    return 'UserRouteArgs{key: $key, currentUser: $currentUser, parentContex: $parentContex}';
+  }
 }
 
 /// generated route for
@@ -358,14 +568,14 @@ class OrganizerMapRoute extends PageRouteInfo<OrganizerMapRouteArgs> {
   OrganizerMapRoute({
     Key? key,
     required List<OrganizerModel> organizerdata,
-    required LatLng? currentPosition,
+    required BuildContext parentContex,
   }) : super(
           OrganizerMapRoute.name,
           path: 'organizer-map-page',
           args: OrganizerMapRouteArgs(
             key: key,
             organizerdata: organizerdata,
-            currentPosition: currentPosition,
+            parentContex: parentContex,
           ),
         );
 
@@ -376,18 +586,18 @@ class OrganizerMapRouteArgs {
   const OrganizerMapRouteArgs({
     this.key,
     required this.organizerdata,
-    required this.currentPosition,
+    required this.parentContex,
   });
 
   final Key? key;
 
   final List<OrganizerModel> organizerdata;
 
-  final LatLng? currentPosition;
+  final BuildContext parentContex;
 
   @override
   String toString() {
-    return 'OrganizerMapRouteArgs{key: $key, organizerdata: $organizerdata, currentPosition: $currentPosition}';
+    return 'OrganizerMapRouteArgs{key: $key, organizerdata: $organizerdata, parentContex: $parentContex}';
   }
 }
 
@@ -397,12 +607,14 @@ class OrganizerListRoute extends PageRouteInfo<OrganizerListRouteArgs> {
   OrganizerListRoute({
     Key? key,
     required List<OrganizerModel> organizerdata,
+    required BuildContext parentContex,
   }) : super(
           OrganizerListRoute.name,
           path: 'organizer-list-page',
           args: OrganizerListRouteArgs(
             key: key,
             organizerdata: organizerdata,
+            parentContex: parentContex,
           ),
         );
 
@@ -413,14 +625,17 @@ class OrganizerListRouteArgs {
   const OrganizerListRouteArgs({
     this.key,
     required this.organizerdata,
+    required this.parentContex,
   });
 
   final Key? key;
 
   final List<OrganizerModel> organizerdata;
 
+  final BuildContext parentContex;
+
   @override
   String toString() {
-    return 'OrganizerListRouteArgs{key: $key, organizerdata: $organizerdata}';
+    return 'OrganizerListRouteArgs{key: $key, organizerdata: $organizerdata, parentContex: $parentContex}';
   }
 }

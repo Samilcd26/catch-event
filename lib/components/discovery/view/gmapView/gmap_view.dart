@@ -4,21 +4,22 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../../Data/Models/category_model.dart';
 import '../../../../Data/Models/organizer_model.dart';
+import '../../../../Data/State/root_cubit.dart';
 import '../../../../core/product/helper/dividers.dart';
 import '../../../../core/product/helper/elevated_button.dart';
 import '../../../../core/product/helper/loading_animation.dart';
 import '../listView/list_view.dart';
 
 class OrganizerMapPage extends StatefulWidget {
-  OrganizerMapPage({super.key, required this.organizerdata, required this.currentPosition});
-
+  OrganizerMapPage({super.key, required this.organizerdata, required this.parentContex});
+  final BuildContext parentContex;
   late final List<OrganizerModel> organizerdata;
-  LatLng? currentPosition;
   //final GmapViewModel gmapViewModel = GmapViewModel(OrganizerService(NetworkService.instance.networkManager));
   @override
   State<OrganizerMapPage> createState() => _OrganizerMapPageState();
@@ -27,6 +28,7 @@ class OrganizerMapPage extends StatefulWidget {
 class _OrganizerMapPageState extends State<OrganizerMapPage> {
   List<Marker> _markerList = [];
   bool isLoading = false;
+
   ////////////////////////////////
   @override
   void initState() {
@@ -38,80 +40,50 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
   /// Main widget /////////////////////////////////////////////////P
   @override
   Widget build(BuildContext context) {
-    return widget.currentPosition!.latitude != 0
-        ? Stack(
-            children: [
-              //Google Maps Widgets
-              GoogleMap(
-                myLocationEnabled: true,
-                mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(target: widget.currentPosition!, zoom: 14),
-                markers: Set.of(_markerList),
-                indoorViewEnabled: false,
-                mapToolbarEnabled: false,
-                zoomControlsEnabled: false,
-                buildingsEnabled: false,
-                myLocationButtonEnabled: true,
-                tiltGesturesEnabled: false,
-              ),
+    var state = widget.parentContex.watch<RootCubit>();
+    final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
-              //Filter Button
-              Positioned(
-                  bottom: MediaQuery.of(context).size.height * 0.1,
-                  right: MediaQuery.of(context).size.width * 0.02,
-                  child: CircleAvatar(
-                    child: IconButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "Filters:",
-                                        style: Theme.of(context).textTheme.titleSmall,
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Wrap(
-                                        children: allCategoryList
-                                            .expand((category) => {
-                                                  ElevatedButton.icon(
-                                                    icon: Icon(category.icon),
-                                                    label: Text(category.name.toString()),
-                                                    style: ButtonStyle(
-                                                        backgroundColor: MaterialStatePropertyAll<Color>(
-                                                            category.onSelect! ? Colors.green : category.color!)),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        category.onSelect = !category.onSelect!;
-                                                        category.onSelect!
-                                                            ? selectedCategory.add(category)
-                                                            : selectedCategory.remove(category);
-                                                      });
-                                                    },
-                                                  ),
-                                                  const SizedBox(width: 10)
-                                                })
-                                            .toList(),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              });
-                        },
-                        icon: const Icon(Icons.filter_alt_outlined)),
-                  ))
-            ],
+    Future<void> _goToCoordinate() async {
+      CameraPosition _newLoc = CameraPosition(target: state.currentLocation!, tilt: 60, zoom: 14);
+      final GoogleMapController controller = await _controller.future;
+
+      controller.animateCamera(CameraUpdate.newCameraPosition(_newLoc));
+    }
+
+    return state.currentLocation!.latitude != 0
+        ? BlocListener(
+            bloc: BlocProvider.of<RootCubit>(widget.parentContex),
+            listener: (context, state) {
+              Future.delayed(const Duration(seconds: 2), () {
+                _goToCoordinate();
+              });
+            },
+            child: Stack(
+              children: [
+                //Google Maps Widgets
+                GoogleMap(
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  myLocationEnabled: true,
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(target: widget.parentContex.watch<RootCubit>().currentLocation!, zoom: 14),
+                  markers: Set.of(_markerList),
+                  indoorViewEnabled: false,
+                  mapToolbarEnabled: false,
+                  zoomControlsEnabled: true,
+                  buildingsEnabled: false,
+                  myLocationButtonEnabled: true,
+                  tiltGesturesEnabled: false,
+                ),
+              ],
+            ),
           )
         : const LoadingBar();
   }
 
 //Markers
   loadingMarkerData() async {
-    List emty = [];
     Uint8List customMarker;
     await Future.wait(widget.organizerdata.map((organizerElement) async => {
           Future.wait(organizerElement.event!.map((eventItem) async => {
@@ -165,7 +137,7 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
                                   ListTile(
                                     title: Text('Etkinlik Detayı'),
                                     subtitle: ReadMoreText(
-                                      eventItem.shortDescription.toString(),
+                                      eventItem.description.toString(),
                                       trimLines: 1,
                                     ),
                                   )
@@ -241,29 +213,5 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
 }
-
-enum OrganizerCategories {
-  FOOD,
-  CULTURAL,
-  TOURISTY,
-  SHOOP,
-  CHARITABLE,
-  COMPETITION,
-  RELIGIOUS,
-  ART,
-  BUSINESS,
-  EDUCATION,
-  MUSIC,
-}
-
-List<CategoryModel> allCategoryList = [
-  CategoryModel(OrganizerCategories.FOOD.name, Icons.lunch_dining_rounded, false, Colors.amber),
-  CategoryModel(OrganizerCategories.CULTURAL.name, Icons.theater_comedy_rounded, false, Colors.purple),
-  CategoryModel(OrganizerCategories.TOURISTY.name, Icons.beach_access, false, Colors.blueGrey),
-  CategoryModel(OrganizerCategories.SHOOP.name, Icons.shopping_bag_rounded, false, Colors.cyan),
-  CategoryModel(OrganizerCategories.CHARITABLE.name, Icons.handshake_rounded, false, Colors.red),
-  CategoryModel(OrganizerCategories.COMPETITION.name, Icons.emoji_events_rounded, false, Colors.blueAccent),
-  CategoryModel(OrganizerCategories.RELIGIOUS.name, Icons.mosque_rounded, false, Colors.black54),
-];
 
 List<CategoryModel> selectedCategory = [];

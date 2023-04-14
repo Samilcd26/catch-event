@@ -106,12 +106,12 @@ class EventInfoPage extends StatelessWidget {
                   const Divider(height: 50),
                   ListTile(
                     title: const Text("Açıklama"),
-                    subtitle: ReadMoreText(event!.longDescription.toString(), trimLines: 3),
+                    subtitle: ReadMoreText(event!.description.toString(), trimLines: 3),
                   ),
                   const Divider(),
                   //Partner list
                   HeadSmallText(text: "Katılımcılar"),
-                  event!.eventPartners!.isNotEmpty
+                  event!.eventPartners != null
                       ? SizedBox(
                           height: MediaQuery.of(context).size.height * 0.2,
                           child: SingleChildScrollView(
@@ -139,19 +139,21 @@ class EventInfoPage extends StatelessWidget {
                       : const SizedBox(height: 80),
                   const Divider(height: 80),
                   HeadSmallText(text: "Organizatör"),
-                  ListTile(
-                    leading: CircleAvatar(backgroundImage: NetworkImage(organizerModel!.image.toString())),
-                    title: Text(organizerModel!.title.toString()),
-                    subtitle: ReadMoreText(
-                      organizerModel!.description.toString(),
-                      trimLength: 60,
-                    ),
-                    trailing: IconButton(
-                        onPressed: () {
-                          AutoRouter.of(context).push(OrganizerInfoRoute(organizerModel: organizerModel!));
-                        },
-                        icon: const Icon(Icons.arrow_forward_ios_rounded)),
-                  ),
+                  organizerModel!.image != null
+                      ? ListTile(
+                          leading: CircleAvatar(backgroundImage: NetworkImage(organizerModel!.image.toString())),
+                          title: Text(organizerModel!.title.toString()),
+                          subtitle: ReadMoreText(
+                            organizerModel!.description.toString(),
+                            trimLength: 60,
+                          ),
+                          trailing: IconButton(
+                              onPressed: () {
+                                AutoRouter.of(context).push(OrganizerInfoRoute(organizerModel: organizerModel!));
+                              },
+                              icon: const Icon(Icons.arrow_forward_ios_rounded)),
+                        )
+                      : const SizedBox(),
                   const Divider(height: 80),
                 ],
               ),

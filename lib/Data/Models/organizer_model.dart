@@ -9,21 +9,26 @@ class OrganizerModel extends INetworkModel<OrganizerModel> {
   int? id;
   String? email;
   String? title;
+  bool? verify;
   String? description;
   String? image;
-  String? openingHours;
+
+  int? eventLimit;
+  DateTime? eventLimitRefreshDate;
   List<int>? followedList;
   List<int>? followerList;
-  Address? address;
+  List<Address>? address;
   List<Event>? event;
 
   OrganizerModel(
       {this.id,
       this.email,
       this.title,
+      this.eventLimit,
+      this.eventLimitRefreshDate,
+      this.verify,
       this.description,
       this.image,
-      this.openingHours,
       this.followedList,
       this.followerList,
       this.address,
@@ -46,7 +51,7 @@ class OrganizerModel extends INetworkModel<OrganizerModel> {
 @JsonSerializable()
 class Address {
   int? id;
-  int? postalCode;
+  String? postalCode;
   String? country;
   String? state;
   String? city;
@@ -88,14 +93,13 @@ class Coordinate {
 }
 
 @JsonSerializable()
-class Event {
+class Event extends INetworkModel<Event> {
   int? id;
   int? organizerId;
   String? title;
   String? status;
-  String? shortDescription;
-  String? longDescription;
-  double? price;
+  String? description;
+  int? price;
   String? currency;
   String? onlineEventUrl;
   String? eventPlatform;
@@ -121,8 +125,7 @@ class Event {
       this.organizerId,
       this.title,
       this.status,
-      this.shortDescription,
-      this.longDescription,
+      this.description,
       this.price,
       this.currency,
       this.onlineEventUrl,
@@ -148,6 +151,11 @@ class Event {
 
   Map<String, dynamic> toJson() {
     return _$EventToJson(this);
+  }
+
+  @override
+  Event fromJson(Map<String, dynamic> json) {
+    return _$EventFromJson(json);
   }
 }
 

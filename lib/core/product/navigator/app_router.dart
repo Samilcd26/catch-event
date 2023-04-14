@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../Data/Models/organizer_model.dart';
+import '../../../Data/Models/user_model.dart';
 import '../../../components/addEvent/view/add_event.dart';
+import '../../../components/addEvent/view/search_location.dart';
 import '../../../components/discovery/view/discovery.dart';
 import '../../../components/discovery/view/filter.dart';
 import '../../../components/discovery/view/gmapView/gmap_view.dart';
@@ -34,6 +36,7 @@ part 'app_router.gr.dart';
         AutoRoute(page: TicketPage),
         AutoRoute(page: UserPage),
       ]),
+      AutoRoute(page: SearchLocationPage),
       AutoRoute(page: FilterPage),
       AutoRoute(page: OrganizerInfoPage),
       AutoRoute(page: EventInfoPage),

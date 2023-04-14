@@ -11,10 +11,14 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       firstName: json['firstName'] as String?,
       lastName: json['lastName'] as String?,
       birtDate: json['birtDate'] as String?,
-      email: json['email'] as String?,
-      byOrganized: (json['byOrganized'] as List<dynamic>?)
+      disLikeList: (json['disLikeList'] as List<dynamic>?)
           ?.map((e) => e as int)
           .toList(),
+      email: json['email'] as String?,
+      byOrganized: json['byOrganized'] == null
+          ? null
+          : OrganizerModel.fromJson(
+              json['byOrganized'] as Map<String, dynamic>),
       imageURL: json['imageURL'] as String?,
       likeList:
           (json['likeList'] as List<dynamic>?)?.map((e) => e as int).toList(),
@@ -40,6 +44,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'byOrganized': instance.byOrganized,
       'imageURL': instance.imageURL,
       'likeList': instance.likeList,
+      'disLikeList': instance.disLikeList,
       'followOrganizer': instance.followOrganizer,
       'userEventStore': instance.userEventStore,
       'role': instance.role,

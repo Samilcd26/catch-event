@@ -11,5 +11,7 @@ abstract class IAccountService {
 
   //Get Organizer by city name
   Future<UserModel?> getUserById(int id);
+  Future<OrganizerModel?> getCurretnOrganizer(int organizerId);
   Future<List<OrganizerModel>?> getFollowOrganizers(List<int> idList);
+  Future<void> toBeOrganizer(int userId);
 }

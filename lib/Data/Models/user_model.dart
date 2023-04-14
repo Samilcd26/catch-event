@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:vexana/vexana.dart';
 
+import 'organizer_model.dart';
+
 part 'user_model.g.dart';
 
 @JsonSerializable()
@@ -10,9 +12,10 @@ class UserModel extends INetworkModel<UserModel> {
   String? lastName;
   String? birtDate;
   String? email;
-  List<int>? byOrganized;
+  OrganizerModel? byOrganized;
   String? imageURL;
   List<int>? likeList;
+  List<int>? disLikeList;
   List<int>? followOrganizer;
   List<int>? userEventStore;
   String? role;
@@ -24,6 +27,7 @@ class UserModel extends INetworkModel<UserModel> {
       this.firstName,
       this.lastName,
       this.birtDate,
+      this.disLikeList,
       this.email,
       this.byOrganized,
       this.imageURL,

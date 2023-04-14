@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -6,47 +7,63 @@ import 'package:intl/intl.dart';
 
 import '../../../../Data/Models/organizer_model.dart';
 import '../../../../Data/State/root_cubit.dart';
+import '../../../../core/product/helper/loading_animation.dart';
 import '../../../../core/product/helper/text.dart';
 import '../../../../core/product/navigator/app_router.dart';
 
-class OrganizerListPage extends StatelessWidget {
-  OrganizerListPage({super.key, required this.organizerdata});
+class OrganizerListPage extends StatefulWidget {
+  OrganizerListPage({super.key, required this.organizerdata, required this.parentContex});
   late final List<OrganizerModel> organizerdata;
+  final BuildContext parentContex;
 
-  //final GmapViewModel gmapViewModel = GmapViewModel(OrganizerService(NetworkProduct.instance.networkManager));
+  @override
+  State<OrganizerListPage> createState() => _OrganizerListPageState();
+}
+
+class _OrganizerListPageState extends State<OrganizerListPage> {
   @override
   Widget build(BuildContext context) {
+    var _rootState = widget.parentContex.read<RootCubit>();
+    List<Event>? eventList = _rootState.events;
     initializeDateFormatting();
-    List<Event>? eventList = context.read<RootCubit>().events;
+
     return Scaffold(
-        body: CustomScrollView(
-      slivers: [
-        const SliverAppBar(
-          expandedHeight: 200,
-          // flexibleSpace: ,
-        ),
-        SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              //Card height
-              childAspectRatio: 0.65,
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              childCount: eventList!.length,
-              (context, index) {
-                return EventInfoCard(
-                  globalContex: context,
-                  event: eventList[index],
-                );
-              },
-            ))
-      ],
+        body: BlocListener(
+      bloc: BlocProvider.of<RootCubit>(widget.parentContex),
+      listener: (context, state) {
+        eventList = widget.parentContex.read<RootCubit>().events;
+        setState(() {});
+      },
+      child: CustomScrollView(
+        slivers: [
+          const SliverAppBar(
+            expandedHeight: 200,
+            // flexibleSpace: ,
+          ),
+          SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                //Card height
+                childAspectRatio: 0.65,
+                crossAxisCount: 2,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                childCount: eventList!.length,
+                (context, index) {
+                  return EventInfoCard(
+                    globalContex: context,
+                    event: eventList![index],
+                  );
+                },
+              ))
+        ],
+      ),
     ));
   }
 }
 
+// ignore: must_be_immutable
 class EventInfoCard extends StatelessWidget {
   EventInfoCard({super.key, required this.event, required this.globalContex});
   BuildContext globalContex;
@@ -64,11 +81,12 @@ class EventInfoCard extends StatelessWidget {
           child: Column(
             children: [
               //Event Image
-
-              Container(
+              CachedNetworkImage(
+                imageUrl: event!.imageUrl ?? "https://arctype.com/blog/content/images/2021/04/NULL.jpg",
+                placeholder: (context, url) => const ImageLoadAnimation(),
                 height: 100,
-                color: Colors.redAccent,
-                //decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(imageUrl!), fit: BoxFit.cover)),
+                fit: BoxFit.cover,
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
 
               Padding(
