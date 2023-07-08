@@ -3,40 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-import '../../../Data/State/organizer_cubit.dart';
-import '../../../Data/State/root_cubit.dart';
-import '../../../business/services/impl/OrganizerService.dart';
+import '../../../Data/State/account_cubit.dart';
 import '../../../core/product/helper/loading_animation.dart';
 import '../../../core/product/navigator/app_router.dart';
-import '../../../core/product/services/network_service.dart';
 
+@RoutePage()
 class DiscoveryPage extends StatelessWidget {
   const DiscoveryPage({super.key, required this.parentContex});
   final BuildContext parentContex;
 
   @override
   Widget build(BuildContext Gcontext) {
-    var _rootState = parentContex.read<RootCubit>();
+    var _accountState = parentContex.read<AccountCubit>();
 
-    return _rootState.isLoading
+    return _accountState.isLoading
         ? AutoTabsRouter.tabBar(
             routes: [
               //?OrganizerMapPage
-              OrganizerMapRoute(organizerdata: _rootState.organizerData, parentContex: parentContex),
+              OrganizerMapRoute(organizerdata: _accountState.organizerData, parentContex: parentContex),
               //?OrganizerListPage
-              OrganizerListRoute(organizerdata: _rootState.organizerData, parentContex: parentContex)
+              OrganizerListRoute(organizerdata: _accountState.organizerData, parentContex: parentContex)
             ],
             physics: const NeverScrollableScrollPhysics(),
             builder: (context, child, tabController) {
-              return BlocProvider(
-                  create: (context) => OrganizerCubit(
-                        organizerService: OrganizerService(NetworkService.instance.networkManager),
-                      ),
-                  child: _discoveryNaviBar(
-                    parent2Contex: parentContex,
-                    gcontex: Gcontext,
-                    child: child,
-                  ));
+              return _discoveryNaviBar(
+                parent2Contex: parentContex,
+                gcontex: Gcontext,
+                child: child,
+              );
             },
           )
         : const LoadingBar();

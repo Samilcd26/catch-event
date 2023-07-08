@@ -12,23 +12,27 @@ class HeadSmallText extends StatelessWidget {
 
 //ignore: must_be_immutable
 class KeyValueText extends StatelessWidget {
-  KeyValueText({super.key, required this.title, required this.discript});
+  KeyValueText({super.key, required this.visible, required this.title, required this.discript});
 
   //
-  String title;
-  String discript;
+  final String title;
+  final String discript;
+  final bool visible;
   //
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        Text(discript)
-      ],
+    return Visibility(
+      visible: visible,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Text(discript)
+        ],
+      ),
     );
   }
 }
@@ -40,5 +44,17 @@ class BodySmallText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text, style: Theme.of(context).textTheme.bodySmall);
+  }
+}
+
+class CenterText extends StatelessWidget {
+  const CenterText({super.key, required this.data});
+  final String data;
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      data,
+      textAlign: TextAlign.center,
+    );
   }
 }

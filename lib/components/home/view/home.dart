@@ -1,18 +1,22 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kartal/kartal.dart';
 import 'package:readmore/readmore.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../Data/Models/organizer_model.dart';
 import '../../../Data/Models/user_model.dart';
-import '../../../Data/State/root_cubit.dart';
+import '../../../Data/State/account_cubit.dart';
+import '../../../Data/State/organizer_cubit.dart';
 import '../../../Data/State/ssfl_cubit.dart';
+import '../../../core/product/helper/cached_network_image.dart';
 import '../../../core/product/helper/loading_animation.dart';
+import '../../../core/product/helper/snack-bars.dart';
+import '../../../core/product/helper/text_button.dart';
 import '../../../core/product/navigator/app_router.dart';
-import '../../addEvent/view/add_event.dart';
 
+@RoutePage()
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.parentContex});
   final BuildContext parentContex;
@@ -22,17 +26,24 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool commentBoxVisible = false;
-
-  void refresh() {
-    setState(() {});
-  }
+  double mainhorizontal = 10;
+  String sharedMessage = "Hello";
 
   @override
   Widget build(BuildContext context) {
-    ;
-    var _rootState = widget.parentContex.watch<RootCubit>();
+    var rootState = widget.parentContex.watch<AccountCubit>();
+    UserModel currentUser = rootState.currentUser!;
+    int? followOrganizerLength = rootState.followOrganizerList != null ? rootState.followOrganizerList?.length : 0;
+    var ssflState = widget.parentContex.read<SSFLCubit>();
+    TextEditingController commentController = TextEditingController();
+    void refresh() {
+      setState(() {
+        rootState.initializ();
+      });
+    }
+
     //?
-    return _rootState.isLoading
+    return rootState.isLoading
         ? SafeArea(
             child: NestedScrollView(
                 headerSliverBuilder: ((context, innerBoxIsScrolled) {
@@ -40,7 +51,7 @@ class _HomePageState extends State<HomePage> {
                     SliverAppBar(
                       backgroundColor: Colors.black,
                       leading: Image.asset("assets/logo.png"),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(50))),
+                      // shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(50))),
                       actions: [
                         IconButton(
                           icon: const Icon(Icons.search),
@@ -48,6 +59,7 @@ class _HomePageState extends State<HomePage> {
                             showSearch(context: context, delegate: SearchBar(ccontex: context));
                           },
                         ),
+                        //!Notification Button
                         IconButton(onPressed: () {}, icon: _notificationIcon(counter: 2)),
                       ],
                       titleSpacing: MediaQuery.of(context).size.width * 0.7,
@@ -65,127 +77,143 @@ class _HomePageState extends State<HomePage> {
                       },
                     );
                   },
-                  child: Container(
-                    color: Colors.black,
-                    child: ListView.builder(
-                        itemCount: _rootState.followOrganizerList != null ? _rootState.followOrganizerList?.length : 0,
-                        itemBuilder: ((context, index) {
-                          return Column(
-                            children: _rootState.followOrganizerList![index].event!
-                                .map((eventList) =>
+                  child: ListView.builder(
+                      itemCount: followOrganizerLength,
+                      itemBuilder: ((context, index) {
+                        OrganizerModel organizerItem = rootState.followOrganizerList![index];
+                        return followOrganizerLength != 0
+                            ? Column(
+                                children: rootState.followOrganizerList![index].event!
+                                    .map((eventList) =>
 
-                                    //Folowwed organizer event item
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                                      child: Container(
-                                        decoration: BoxDecoration(color: Colors.black),
-                                        child: Column(
+                                        //Folowwed organizer event item
+                                        Column(
                                           children: [
-                                            const Divider(height: 50),
-                                            //Card Title
+                                            //Event Title and avatar icon
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 5),
+                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: mainhorizontal),
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.max,
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Expanded(child: Text(_rootState.followOrganizerList![index].title.toString())),
                                                   Expanded(
-                                                    child: CircleAvatar(
-                                                      backgroundImage:
-                                                          NetworkImage(_rootState.followOrganizerList![index].image.toString()),
-                                                    ),
+                                                      //* Text button:Navigate to Organizer info page
+                                                      child: TextButtonNavigateOrganizerInfo(organizerItem: organizerItem)),
+                                                  Expanded(
+                                                    child:
+                                                        //* Organizer Logo
+                                                        ClipOval(
+                                                            child: CachedImageProvider(
+                                                                imageUrl: "https://arctype.com/blog/content/images/2021/04/NULL.jpg")
+//_rootState.followOrganizerList![index].image.toString()
+                                                            // NetworkImage(_rootState.followOrganizerList![index].image.toString()),
+                                                            ),
                                                   ),
 
-                                                  //?UnFollowButton
+                                                  //*Emty fow expanded
                                                   const Expanded(child: SizedBox()),
                                                 ],
                                               ),
                                             ),
                                             //event ımage
 
-                                            //!!!!!!!!!!!!!!!!!!!!!!Image.network(eventList.imageUrl.toString()),
-                                            CachedNetworkImage(
-                                              imageUrl: eventList.imageUrl ?? "https://arctype.com/blog/content/images/2021/04/NULL.jpg",
-                                              placeholder: (context, url) => const ImageLoadAnimation(),
-                                              errorWidget: (context, url, error) => const Icon(Icons.error),
-                                            ),
-                                            //Event actions buttons
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Wrap(
-                                                  children: [
-                                                    //LikeButon
-                                                    LikeDislikeButtonGroup(
-                                                        updateState: refresh, parentContex: widget.parentContex, eventID: eventList.id),
-                                                    //Comment
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            commentBoxVisible = !commentBoxVisible;
-                                                          });
-                                                          // context.read<SSFLCubit>().addCommentToEvent(context.read<AccountCubit>().currentUser!.id!, eventList.id!, comment)
-                                                        },
-                                                        icon: const Icon(Icons.comment)),
-                                                    //Share
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          Share.share('check out my website https://example.com');
-                                                        },
-                                                        icon: const Icon(Icons.share)),
-                                                  ],
-                                                ),
-
-                                                //Save Event
-                                                SaveEventButton(
-                                                    parentContex: widget.parentContex, eventID: eventList.id, updateState: refresh)
-                                              ],
-                                            ),
-                                            const SizedBox(height: 20),
-                                            //Event Description
+                                            //!!!Yeniden düzenle
+                                            CachedNetImage(
+                                                imageUrl: eventList.imageUrl ?? "https://arctype.com/blog/content/images/2021/04/NULL.jpg"),
+                                            //* Event actions buttons
                                             Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: mainhorizontal),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Wrap(
+                                                    children: [
+                                                      //* Like-dislike Button group
+                                                      LikeDislikeButtonGroup(
+                                                          updateState: refresh, parentContex: widget.parentContex, eventID: eventList.id),
+                                                      //TODO Comment Button visibility
+                                                      /*
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              commentBoxVisible = !commentBoxVisible;
+                                                            });
+                                                          },
+                                                          icon: const Icon(Icons.comment)),
+                                                          */
+                                                      //* Event Shared button
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            Share.share(sharedMessage);
+                                                          },
+                                                          icon: const Icon(Icons.share)),
+                                                    ],
+                                                  ),
+
+                                                  //* Save Event
+                                                  SaveEventButton(
+                                                      parentContex: widget.parentContex, eventID: eventList.id, updateState: refresh)
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            //* Event Description
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: mainhorizontal),
                                               child: ReadMoreText(
-                                                eventList.description.toString(),
+                                                eventList.description.isNotNullOrNoEmpty ? eventList.description.toString() : "...",
                                                 trimLines: 2,
-                                                colorClickableText: Colors.pink,
+                                                colorClickableText: Theme.of(context).colorScheme.primary,
                                                 trimMode: TrimMode.Line,
-                                                trimCollapsedText: 'Show more',
-                                                trimExpandedText: 'Show less',
+                                                trimCollapsedText: 'Daha Fazlasını Göster',
+                                                trimExpandedText: 'Daha Azını Göster',
                                               ),
                                             ),
 
-                                            //Event Commants List
-                                            //! Etkinlik başladıktan sonra aktif olucak boot olmasın diye
+                                            //TODO Event Commants List
+                                            /*
                                             TextButton(
                                                 onPressed: () {
                                                   showDialog<String>(
                                                     context: context,
                                                     builder: (BuildContext context) =>
+                                                        //! //////////////////////
                                                         _commantListWidget(commentIdList: eventList.commentList),
                                                   );
                                                 },
-                                                child: Text('${eventList.commentList!.length.toString()} Yorumun Tümünü Görüntüle')),
+                                                child: Text(eventList.commentList!.isNotEmpty
+                                                    ? '${eventList.commentList!.length.toString()} Yorumun Tümünü Görüntüle'
+                                                    : "Henüz Yorum Yok")),
+                                            */
+                                            const SizedBox(height: 20),
                                             const Divider(),
+                                            //* Comment Add Textfiled
                                             Visibility(
                                               visible: commentBoxVisible,
                                               child: TextFormField(
+                                                controller: commentController,
                                                 decoration: InputDecoration(
-                                                    suffixIcon: IconButton(onPressed: () {}, icon: Icon(Icons.send)),
+                                                    suffixIcon: IconButton(
+                                                        onPressed: () {
+                                                          CommentModel newComment = CommentModel(
+                                                            contents: commentController.text,
+                                                          );
+                                                          setState(() {
+                                                            ssflState.addCommentToEvent(currentUser.id!, eventList.id!, newComment);
+                                                          });
+                                                        },
+                                                        icon: Icon(Icons.send)),
                                                     label: const Center(
                                                       child: Text("Yorum"),
                                                     )),
                                               ),
                                             ),
                                           ],
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          );
-                        })),
-                  ),
+                                        ))
+                                    .toList(),
+                              )
+                            : const Center(child: Text("Gösterilicek Birşey Yok ..."));
+                      })),
                 )))
         : const LoadingBar();
   }
@@ -209,7 +237,7 @@ class _SaveEventButtonState extends State<SaveEventButton> {
   UserModel _currentUser = UserModel();
   @override
   void initState() {
-    _currentUser = widget.parentContex.read<RootCubit>().currentUser!;
+    _currentUser = widget.parentContex.read<AccountCubit>().currentUser!;
     isSave = _currentUser.userEventStore!.contains(widget.eventID);
     super.initState();
   }
@@ -242,7 +270,7 @@ class _SaveEventButtonState extends State<SaveEventButton> {
         },
         icon: Icon(
           isSave ? Icons.bookmark_added : Icons.bookmark_add,
-          color: isSave ? Colors.white : Colors.white,
+          color: isSave ? Colors.blue : Colors.black,
         ));
   }
 }
@@ -267,19 +295,19 @@ class _LikeDislikeButtonGroupState extends State<LikeDislikeButtonGroup> {
   bool _isDisLike = false;
   @override
   void initState() {
-    _isLike = widget.parentContex.read<RootCubit>().currentUser!.likeList!.contains(widget.eventID);
-    _isDisLike = widget.parentContex.read<RootCubit>().currentUser!.disLikeList != null
-        ? widget.parentContex.read<RootCubit>().currentUser!.disLikeList!.contains(widget.eventID)
+    _isLike = widget.parentContex.read<AccountCubit>().currentUser!.likeList!.contains(widget.eventID);
+    _isDisLike = widget.parentContex.read<AccountCubit>().currentUser!.disLikeList != null
+        ? widget.parentContex.read<AccountCubit>().currentUser!.disLikeList!.contains(widget.eventID)
         : false;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var _rootState = widget.parentContex.read<RootCubit>();
+    var _rootState = widget.parentContex.read<AccountCubit>();
     var _ssflState = widget.parentContex.read<SSFLCubit>();
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: Colors.white), borderRadius: BorderRadius.circular(50)),
+      decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(50)),
       child: Row(
         children: [
           IconButton(
@@ -310,7 +338,7 @@ class _LikeDislikeButtonGroupState extends State<LikeDislikeButtonGroup> {
                   }
                 }
               },
-              icon: Icon(Icons.thumb_up_alt, color: _isLike == true ? Colors.green.shade700 : Colors.white)),
+              icon: Icon(Icons.thumb_up_alt, color: _isLike == true ? Colors.green.shade700 : Colors.black)),
           IconButton(
               onPressed: () async {
                 if (!_isDisLike && !_isLike) {
@@ -339,7 +367,7 @@ class _LikeDislikeButtonGroupState extends State<LikeDislikeButtonGroup> {
                   }
                 }
               },
-              icon: Icon(Icons.thumb_down_alt, color: _isDisLike == true ? Colors.redAccent.shade400 : Colors.white))
+              icon: Icon(Icons.thumb_down_alt, color: _isDisLike == true ? Colors.redAccent.shade400 : Colors.black))
         ],
       ),
     );
@@ -356,16 +384,19 @@ class _commantListWidget extends StatelessWidget {
     context.read<SSFLCubit>().getCommentList(commentIdList);
     final List<CommentModel> _commentList = context.read<SSFLCubit>().commentsList;
     return AlertDialog(
-        title: Text('Toplam ${commentIdList!.length.toString()} mesaj var.'),
-        content: const Text('AlertDialog description'),
+        title: Text('Toplam ${commentIdList!.length.toString()} yorum var.'),
         actions: commentIdList!.isNotEmpty && _commentList.isNotEmpty
             ? _commentList
-                .map((e) => Column(
+                .map((commentItem) => Column(
                       children: [
                         ListTile(
                           leading: CircleAvatar(child: FlutterLogo(size: 40.0)),
-                          title: Text(e.byAddId.toString()),
-                          subtitle: Text(e.contents.toString()),
+                          title: TextButton(
+                              onPressed: () {
+                                AutoRouter.of(context).push(UserInfoRoute(userId: commentItem.addedUsersId!));
+                              },
+                              child: Text(commentItem.addedUsersName.toString())),
+                          subtitle: Text(commentItem.contents.toString()),
                           trailing: Icon(Icons.more_vert),
                         )
                       ],
@@ -413,9 +444,9 @@ class SearchBar extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<OrganizerModel>? searchList = [];
-    ccontex.read<RootCubit>().searchOrganizer(query);
+    ccontex.read<OrganizerCubit>().searchOrganizer(query);
 
-    searchList = ccontex.read<RootCubit>().searchList;
+    searchList = ccontex.read<OrganizerCubit>().searchList;
     if (searchList!.isNotEmpty) {
       return ListView.builder(
           scrollDirection: Axis.vertical,
@@ -450,7 +481,7 @@ class _notificationIcon extends StatelessWidget {
         children: [
           const Icon(
             Icons.notifications,
-            color: Colors.white,
+            //color: Colors.black,
             size: 30,
           ),
           Container(
@@ -462,7 +493,7 @@ class _notificationIcon extends StatelessWidget {
               width: 15,
               height: 15,
               decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: const Color(0xffc32c37), border: Border.all(color: Colors.white, width: 1)),
+                  BoxDecoration(shape: BoxShape.circle, color: const Color(0xffc32c37), border: Border.all(color: Colors.black, width: 1)),
               child: Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: Center(

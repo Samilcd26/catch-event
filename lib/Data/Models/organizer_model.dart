@@ -12,6 +12,7 @@ class OrganizerModel extends INetworkModel<OrganizerModel> {
   bool? verify;
   String? description;
   String? image;
+  String? organizerName;
 
   int? eventLimit;
   DateTime? eventLimitRefreshDate;
@@ -22,6 +23,7 @@ class OrganizerModel extends INetworkModel<OrganizerModel> {
 
   OrganizerModel(
       {this.id,
+      this.organizerName,
       this.email,
       this.title,
       this.eventLimit,
@@ -97,6 +99,7 @@ class Event extends INetworkModel<Event> {
   int? id;
   int? organizerId;
   String? title;
+  String? type;
   String? status;
   String? description;
   int? price;
@@ -124,6 +127,7 @@ class Event extends INetworkModel<Event> {
       {this.id,
       this.organizerId,
       this.title,
+      this.type,
       this.status,
       this.description,
       this.price,
@@ -162,14 +166,25 @@ class Event extends INetworkModel<Event> {
 @JsonSerializable()
 class CommentModel extends INetworkModel<CommentModel> {
   int? id;
-  int? byAddId;
+  int? addedUsersId;
   String? contents;
+  String? addedUsersName;
+  String? addedUsersImage;
   List<int>? likeed;
   List<int>? subComment;
   String? createdDate;
   String? changedDate;
 
-  CommentModel({this.id, this.byAddId, this.contents, this.likeed, this.subComment, this.createdDate, this.changedDate});
+  CommentModel(
+      {this.id,
+      this.addedUsersImage,
+      this.addedUsersName,
+      this.addedUsersId,
+      this.contents,
+      this.likeed,
+      this.subComment,
+      this.createdDate,
+      this.changedDate});
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     return _$CommentModelFromJson(json);

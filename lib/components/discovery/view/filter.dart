@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -5,11 +6,12 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import '../../../Data/Models/category_model.dart';
 import '../../../Data/Models/filter_organizer_model.dart';
-import '../../../Data/State/root_cubit.dart';
+import '../../../Data/State/account_cubit.dart';
 import '../../../core/product/helper/text.dart';
 import '../../../core/product/helper/text_field.dart';
 import '../viewModel/event_categories.dart';
 
+@RoutePage()
 class FilterPage extends StatefulWidget {
   const FilterPage({super.key, required this.parentContex});
   final BuildContext parentContex;
@@ -60,8 +62,8 @@ class _FilterPageState extends State<FilterPage> {
                 int.parse(minPrice.text),
                 int.tryParse(maxPrice.text));
 
-            context.read<RootCubit>().filterModel = _filter;
-            context.read<RootCubit>().getAllOrganizerByFilter();
+            context.read<AccountCubit>().filterModel = _filter;
+            context.read<AccountCubit>().getAllOrganizerByFilter();
           }),
       appBar: AppBar(backgroundColor: Colors.black),
       body: SingleChildScrollView(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -7,11 +8,12 @@ import 'package:vexana/vexana.dart';
 import '../../../Data/Models/distance_model.dart';
 import '../../../Data/Models/filter_organizer_model.dart';
 import '../../../Data/Models/organizer_model.dart';
+import '../../../core/product/services/network_service.dart';
 import '../IOrganizerService.dart';
 
 class OrganizerService extends IOrganizerService {
   OrganizerService(INetworkManager networkManager) : super(networkManager);
-  final String baseUrl = "http://192.168.1.105:8099/api/v1";
+  final String baseUrl = "http://192.168.1.67:8099/api/v1";
   final String apiKey = "AIzaSyAQZ-vxDLx856vCV38MFiWJhUIN_qmeS4k";
 
   @override
@@ -52,10 +54,7 @@ class OrganizerService extends IOrganizerService {
   @override
   Future<List<OrganizerModel>?> getOrganizerByFilter(FilterOrganizerModel filter) async {
     final response = await http.post(Uri.parse('$baseUrl/organizer/allDataByFilter'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(filter.toJson()));
+        headers: NetworkService.globalHeader, body: jsonEncode(filter.toJson()));
 
     if (response.statusCode == 200) {
       List<OrganizerModel> organizerList = [];
@@ -64,10 +63,6 @@ class OrganizerService extends IOrganizerService {
       await Future.wait(jsonResponse.map((e) async => organizerList.add(OrganizerModel.fromJson(e))));
 
       return organizerList;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load album');
     }
   }
 
@@ -90,12 +85,10 @@ class OrganizerService extends IOrganizerService {
   }
 
   @override
-  Future<http.Response> createNewEvent(int organizerId, Event eventModel) async {
+  Future<bool> createNewEvent(int organizerId, Event eventModel) async {
+    inspect(NetworkService.getHeader());
     final response = await http.post(Uri.parse('$baseUrl/organizer/addEvent?organizerId=$organizerId'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(eventModel.toJson()));
-    return response;
+        headers: NetworkService.getHeader(), body: jsonEncode(eventModel.toJson()));
+    return response.statusCode == 200 ? true : false;
   }
 }

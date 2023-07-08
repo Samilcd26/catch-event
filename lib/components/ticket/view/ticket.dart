@@ -1,17 +1,19 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../Data/State/root_cubit.dart';
+import '../../../Data/State/account_cubit.dart';
 import '../../../core/product/helper/loading_animation.dart';
 
+@RoutePage()
 class TicketPage extends StatelessWidget {
   const TicketPage({super.key, required this.parentContex});
   final BuildContext parentContex;
 
   @override
   Widget build(BuildContext context) {
-    return parentContex.watch<RootCubit>().isLoading
+    return parentContex.watch<AccountCubit>().isLoading
         ? SafeArea(
             child: Scaffold(
               backgroundColor: Colors.grey.shade300,

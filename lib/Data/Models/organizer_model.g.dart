@@ -9,6 +9,7 @@ part of 'organizer_model.dart';
 OrganizerModel _$OrganizerModelFromJson(Map<String, dynamic> json) =>
     OrganizerModel(
       id: json['id'] as int?,
+      organizerName: json['organizerName'] as String?,
       email: json['email'] as String?,
       title: json['title'] as String?,
       eventLimit: json['eventLimit'] as int?,
@@ -40,6 +41,7 @@ Map<String, dynamic> _$OrganizerModelToJson(OrganizerModel instance) =>
       'verify': instance.verify,
       'description': instance.description,
       'image': instance.image,
+      'organizerName': instance.organizerName,
       'eventLimit': instance.eventLimit,
       'eventLimitRefreshDate':
           instance.eventLimitRefreshDate?.toIso8601String(),
@@ -92,6 +94,7 @@ Event _$EventFromJson(Map<String, dynamic> json) => Event(
       id: json['id'] as int?,
       organizerId: json['organizerId'] as int?,
       title: json['title'] as String?,
+      type: json['type'] as String?,
       status: json['status'] as String?,
       description: json['description'] as String?,
       price: json['price'] as int?,
@@ -136,6 +139,7 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
       'id': instance.id,
       'organizerId': instance.organizerId,
       'title': instance.title,
+      'type': instance.type,
       'status': instance.status,
       'description': instance.description,
       'price': instance.price,
@@ -163,7 +167,9 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
 
 CommentModel _$CommentModelFromJson(Map<String, dynamic> json) => CommentModel(
       id: json['id'] as int?,
-      byAddId: json['byAddId'] as int?,
+      addedUsersImage: json['addedUsersImage'] as String?,
+      addedUsersName: json['addedUsersName'] as String?,
+      addedUsersId: json['addedUsersId'] as int?,
       contents: json['contents'] as String?,
       likeed: (json['likeed'] as List<dynamic>?)?.map((e) => e as int).toList(),
       subComment:
@@ -175,8 +181,10 @@ CommentModel _$CommentModelFromJson(Map<String, dynamic> json) => CommentModel(
 Map<String, dynamic> _$CommentModelToJson(CommentModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'byAddId': instance.byAddId,
+      'addedUsersId': instance.addedUsersId,
       'contents': instance.contents,
+      'addedUsersName': instance.addedUsersName,
+      'addedUsersImage': instance.addedUsersImage,
       'likeed': instance.likeed,
       'subComment': instance.subComment,
       'createdDate': instance.createdDate,

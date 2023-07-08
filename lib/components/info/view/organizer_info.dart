@@ -8,6 +8,7 @@ import '../../../Data/State/account_cubit.dart';
 import '../../../Data/State/ssfl_cubit.dart';
 import '../../../core/product/helper/loading_animation.dart';
 
+@RoutePage()
 class OrganizerInfoPage extends StatefulWidget {
   OrganizerInfoPage({super.key, required this.organizerModel});
 

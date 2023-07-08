@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
+import 'loading_animation.dart';
 
 class ImageBottomText extends StatelessWidget {
   ImageBottomText({super.key, required this.imageUrl, required this.text});
@@ -95,6 +98,35 @@ class ImageCard extends StatelessWidget {
         ),
         Positioned(bottom: 10, left: 10, child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 25)))
       ],
+    );
+  }
+}
+
+class GradientBackgroundImages extends StatelessWidget {
+  GradientBackgroundImages({super.key, required this.imageUrl, required this.children});
+  String imageUrl;
+  List<Widget> children;
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      placeholder: (context, url) => const ImageLoadAnimation(),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+      imageBuilder: (context, imageProvider) => Container(
+        height: MediaQuery.of(context).size.height * 0.2,
+        decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.center,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0x00000000),
+                Color.fromARGB(255, 20, 2, 2),
+              ],
+            ),
+            image:
+                DecorationImage(image: imageProvider, fit: BoxFit.cover, colorFilter: ColorFilter.mode(Colors.red, BlendMode.colorBurn))),
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: children),
+      ),
     );
   }
 }

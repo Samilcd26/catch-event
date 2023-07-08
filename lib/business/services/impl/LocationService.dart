@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:vexana/vexana.dart';
 
 import '../../../Data/Models/gaddress_model.dart';
+import '../../../core/product/services/network_service.dart';
 import '../ILocationService.dart';
 
 class LocationService extends ILocationService {
@@ -14,7 +15,8 @@ class LocationService extends ILocationService {
   @override
   Future<Results?> getLocationByAddress(String address) async {
     final String baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$googleKey';
-    final response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$googleKey'));
+    final response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?address=$address&key=$googleKey'),
+        headers: NetworkService.getHeader());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -29,8 +31,9 @@ class LocationService extends ILocationService {
 
   @override
   Future<Results?> getLocationByCoordinate(LatLng coordinate) async {
-    final response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate.latitude},${coordinate.longitude}&key=$googleKey'));
+    final response = await http.get(
+        Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate.latitude},${coordinate.longitude}&key=$googleKey'),
+        headers: NetworkService.getHeader());
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.

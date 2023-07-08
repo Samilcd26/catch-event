@@ -2,20 +2,23 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kartal/kartal.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../../../Data/Models/category_model.dart';
 import '../../../../Data/Models/organizer_model.dart';
-import '../../../../Data/State/root_cubit.dart';
-import '../../../../core/product/helper/dividers.dart';
-import '../../../../core/product/helper/elevated_button.dart';
+import '../../../../Data/State/account_cubit.dart';
 import '../../../../core/product/helper/loading_animation.dart';
+import '../../../../core/product/helper/stack.dart';
+import '../../../../core/product/navigator/app_router.dart';
 import '../listView/list_view.dart';
 
+@RoutePage()
 class OrganizerMapPage extends StatefulWidget {
   OrganizerMapPage({super.key, required this.organizerdata, required this.parentContex});
   final BuildContext parentContex;
@@ -28,10 +31,13 @@ class OrganizerMapPage extends StatefulWidget {
 class _OrganizerMapPageState extends State<OrganizerMapPage> {
   List<Marker> _markerList = [];
   bool isLoading = false;
-
+  String _mapStyle = "";
   ////////////////////////////////
   @override
   void initState() {
+    rootBundle.loadString('assets/mapStyle/dark_map.txt').then((string) {
+      _mapStyle = string;
+    });
     loadingMarkerData();
     super.initState();
   }
@@ -40,7 +46,7 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
   /// Main widget /////////////////////////////////////////////////P
   @override
   Widget build(BuildContext context) {
-    var state = widget.parentContex.watch<RootCubit>();
+    var state = widget.parentContex.watch<AccountCubit>();
     final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
     Future<void> _goToCoordinate() async {
@@ -52,7 +58,7 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
 
     return state.currentLocation!.latitude != 0
         ? BlocListener(
-            bloc: BlocProvider.of<RootCubit>(widget.parentContex),
+            bloc: BlocProvider.of<AccountCubit>(widget.parentContex)..changeState,
             listener: (context, state) {
               Future.delayed(const Duration(seconds: 2), () {
                 _goToCoordinate();
@@ -64,10 +70,11 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
                 GoogleMap(
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
+                    controller.setMapStyle(_mapStyle);
                   },
                   myLocationEnabled: true,
                   mapType: MapType.normal,
-                  initialCameraPosition: CameraPosition(target: widget.parentContex.watch<RootCubit>().currentLocation!, zoom: 14),
+                  initialCameraPosition: CameraPosition(target: widget.parentContex.watch<AccountCubit>().currentLocation!, zoom: 14),
                   markers: Set.of(_markerList),
                   indoorViewEnabled: false,
                   mapToolbarEnabled: false,
@@ -99,49 +106,57 @@ class _OrganizerMapPageState extends State<OrganizerMapPage> {
                         onTap: () {
                           showBottomSheet(
 //
-                              backgroundColor: const Color.fromARGB(255, 235, 235, 235),
+                              //backgroundColor: const Color.fromARGB(255, 235, 235, 235),
                               context: context,
                               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
                               builder: (context) {
                                 return Column(mainAxisAlignment: MainAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                                   //Divider
-                                  Container(
-                                    height: MediaQuery.of(context).size.height * 0.2,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(image: NetworkImage(eventItem.imageUrl.toString()), fit: BoxFit.cover)),
-                                    child: Column(mainAxisAlignment: MainAxisAlignment.start, children: const [
-                                      //Divider
-                                      CustomDivider()
-                                    ]),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  // Bgimage
+                                  GradientBackgroundImages(
+                                    imageUrl: eventItem.imageUrl.toString(),
                                     children: [
+                                      //Cancel Button
+                                      Align(
+                                          alignment: Alignment.centerRight,
+                                          child: IconButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            icon: const Icon(Icons.cancel),
+                                          )),
+                                      const Spacer(),
+                                      Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(eventItem.title.toString(), style: Theme.of(context).textTheme.headlineSmall)),
                                       Row(
-                                        children: [Text(eventItem.title.toString(), style: Theme.of(context).textTheme.headlineSmall)],
-                                      ),
-
-                                      /////////////////////////////////////////////////////
-                                      ///go location icon/////////////////////////////////////
-                                      const GoLocationBtn(
-                                        iconData: Icons.navigation_rounded,
-                                        text: "6km\n5Dk",
-                                      ),
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          IntrinsicHeight(
+                                            child: Row(
+                                              children: [
+                                                InfoIconText(text: eventItem.category!, icon: Icons.local_activity),
+                                                VerticalDivider(),
+                                                Text("+18"),
+                                                VerticalDivider(),
+                                                Text(eventItem.price == 0 ? "free" : eventItem.price.toString())
+                                              ],
+                                            ),
+                                          ),
+                                          Text("06-04-2001\n22:04", textAlign: TextAlign.center)
+                                        ],
+                                      )
                                     ],
                                   ),
 
-                                  Column(
-                                    children: [InfoIconText(text: "Konser", icon: Icons.local_activity)],
-                                  ),
-
                                   ListTile(
-                                    title: Text('Etkinlik Detayı'),
+                                    onTap: () => AutoRouter.of(context).push(EventInfoRoute(event: eventItem)),
+                                    title: const Text('Etkinlik Detayı'),
+                                    trailing: const Icon(Icons.arrow_forward_ios_rounded),
                                     subtitle: ReadMoreText(
-                                      eventItem.description.toString(),
+                                      eventItem.description.isNullOrEmpty ? "..." : eventItem.description.isNullOrEmpty.toString(),
                                       trimLines: 1,
                                     ),
                                   )
-//Event list card widget
+                                  //Event list card widget
                                 ]);
                               });
                         },

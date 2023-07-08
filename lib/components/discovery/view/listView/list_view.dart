@@ -6,11 +6,12 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../Data/Models/organizer_model.dart';
-import '../../../../Data/State/root_cubit.dart';
+import '../../../../Data/State/account_cubit.dart';
 import '../../../../core/product/helper/loading_animation.dart';
 import '../../../../core/product/helper/text.dart';
 import '../../../../core/product/navigator/app_router.dart';
 
+@RoutePage()
 class OrganizerListPage extends StatefulWidget {
   OrganizerListPage({super.key, required this.organizerdata, required this.parentContex});
   late final List<OrganizerModel> organizerdata;
@@ -23,15 +24,15 @@ class OrganizerListPage extends StatefulWidget {
 class _OrganizerListPageState extends State<OrganizerListPage> {
   @override
   Widget build(BuildContext context) {
-    var _rootState = widget.parentContex.read<RootCubit>();
-    List<Event>? eventList = _rootState.events;
+    var accountState = widget.parentContex.read<AccountCubit>();
+    List<Event>? eventList = accountState.events;
     initializeDateFormatting();
 
     return Scaffold(
         body: BlocListener(
-      bloc: BlocProvider.of<RootCubit>(widget.parentContex),
+      bloc: BlocProvider.of<AccountCubit>(widget.parentContex)..changeState,
       listener: (context, state) {
-        eventList = widget.parentContex.read<RootCubit>().events;
+        eventList = widget.parentContex.read<AccountCubit>().events;
         setState(() {});
       },
       child: CustomScrollView(
@@ -82,7 +83,8 @@ class EventInfoCard extends StatelessWidget {
             children: [
               //Event Image
               CachedNetworkImage(
-                imageUrl: event!.imageUrl ?? "https://arctype.com/blog/content/images/2021/04/NULL.jpg",
+                //event!.imageUrl ?? "https://arctype.com/blog/content/images/2021/04/NULL.jpg"
+                imageUrl: "https://arctype.com/blog/content/images/2021/04/NULL.jpg",
                 placeholder: (context, url) => const ImageLoadAnimation(),
                 height: 100,
                 fit: BoxFit.cover,
@@ -95,7 +97,13 @@ class EventInfoCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(event!.title.toString(), style: Theme.of(context).textTheme.bodyLarge),
+                        Flexible(
+                          child: Text(
+                            event!.title.toString(),
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -106,8 +114,8 @@ class EventInfoCard extends StatelessWidget {
                       icon: Icons.location_pin,
                     ),
                     const SizedBox(height: 5),
-                    KeyValueText(title: "Date", discript: DateFormat.MMMMd("tr").format(event!.eventDateTime!.first)),
-                    KeyValueText(title: "title", discript: "discript"),
+                    KeyValueText(visible: true, title: "Date", discript: DateFormat.MMMMd("tr").format(event!.eventDateTime!.first)),
+                    KeyValueText(visible: true, title: "Şart", discript: "+18"),
                     const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

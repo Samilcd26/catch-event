@@ -1,5 +1,4 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:vexana/vexana.dart';
 
 import '../../Data/Models/distance_model.dart';
@@ -18,5 +17,5 @@ abstract class IOrganizerService {
   Future<List<OrganizerModel>?> searchOrganizer(String organizerName);
   Future<Position> getCurrentLocation();
   Future<DistanceModel?> getDistance(double dlat, double dlot, double clat, double clot);
-  Future<http.Response> createNewEvent(int organizerId, Event eventModel);
+  Future<bool> createNewEvent(int organizerId, Event eventModel);
 }

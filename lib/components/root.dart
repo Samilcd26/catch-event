@@ -2,18 +2,19 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:threego/business/services/impl/LocationService.dart';
 
 import '../Data/Models/organizer_model.dart';
 import '../Data/Models/user_model.dart';
 import '../Data/State/account_cubit.dart';
 import '../Data/State/organizer_cubit.dart';
-import '../Data/State/root_cubit.dart';
 import '../business/services/impl/AccountService.dart';
 import '../business/services/impl/OrganizerService.dart';
 import '../core/product/helper/loading_animation.dart';
 import '../core/product/navigator/app_router.dart';
 import '../core/product/services/network_service.dart';
 
+@RoutePage()
 class RootPage extends StatefulWidget {
   RootPage({super.key});
 
@@ -22,15 +23,13 @@ class RootPage extends StatefulWidget {
 }
 
 bool isAccountDataSucces = false;
-bool isRootDataSucces = false;
 
 class _RootPageState extends State<RootPage> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<RootCubit>().loadingInitData();
-      context.read<AccountCubit>().loadingUserData();
+      context.read<AccountCubit>().initializ();
     });
   }
 
@@ -42,8 +41,7 @@ class _RootPageState extends State<RootPage> {
     context.read<OrganizerCubit>().currentOrganizer = currentOrganizer;
 
     isAccountDataSucces = context.watch<AccountCubit>().isLoading;
-    isRootDataSucces = context.watch<RootCubit>().isLoading;
-    return isAccountDataSucces == true && isRootDataSucces == true
+    return isAccountDataSucces == true
         ? AutoTabsRouter.tabBar(
             physics: const NeverScrollableScrollPhysics(),
             routes: [
@@ -52,16 +50,17 @@ class _RootPageState extends State<RootPage> {
               DiscoveryRoute(parentContex: context),
               AddEventRoute(parentContex: context, currentUser: currentUser!, currentOrganizer: currentOrganizer!),
               TicketRoute(parentContex: context),
-              UserRoute(parentContex: context, currentUser: currentUser)
+              UserRoute(parentContex: context, currentUser: currentUser, currentOrganizer: currentOrganizer)
               //!!!!!!!!!!!!!!!!
             ],
             builder: (context, child, tabController) {
               tabController.index;
               return Scaffold(
                 body: BlocProvider(
-                  create: (context) => RootCubit(
-                      organizerService: OrganizerService(NetworkService.instance.networkManager),
-                      accoundService: AccountService(NetworkService.instance.networkManager)),
+                  create: (context) => AccountCubit(
+                      locationService: LocationService(NetworkService.getInstance(context).networkManager),
+                      organizerService: OrganizerService(NetworkService.getInstance(context).networkManager),
+                      accoundService: AccountService(NetworkService.getInstance(context).networkManager)),
                   child: child,
                 ),
                 bottomNavigationBar: SafeArea(

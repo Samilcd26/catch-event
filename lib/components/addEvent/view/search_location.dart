@@ -7,11 +7,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../Data/Models/gaddress_model.dart';
 import '../../../Data/Models/organizer_model.dart';
+import '../../../Data/State/account_cubit.dart';
 import '../../../Data/State/organizer_cubit.dart';
-import '../../../Data/State/root_cubit.dart';
 import '../../../business/services/impl/LocationService.dart';
 import '../../../core/product/services/network_service.dart';
 
+@RoutePage()
 class SearchLocationPage extends StatefulWidget {
   SearchLocationPage({super.key, required this.isChangeCurrentLocation});
   late bool isChangeCurrentLocation;
@@ -21,15 +22,19 @@ class SearchLocationPage extends StatefulWidget {
 
 class _SearchLocationPageState extends State<SearchLocationPage> {
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
-
-  final _localService = LocationService(NetworkService.instance.networkManager);
-
+  late final LocationService _localService;
   final locationAddress = TextEditingController();
 
   List<Marker> _currentMarker = [];
   LatLng _selectedCoordinate = LatLng(0, 0);
   String _addressText = "";
   Address _selectedAddress = Address();
+  @override
+  void initState() {
+    super.initState();
+    _localService = LocationService(NetworkService.getInstance(context).networkManager);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -70,9 +75,11 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
 
                 if (!widget.isChangeCurrentLocation) {
                   context.read<OrganizerCubit>().setNewEventAddress(_selectedAddress);
+                  //Event başlatılınca setNewEventAddress temizle
+                } else {
+                  context.read<AccountCubit>().changeCurrentLocation(
+                      LatLng(_selectedAddress.coordinate!.latitude!, _selectedAddress.coordinate!.longitude!), _selectedAddress);
                 }
-                context.read<RootCubit>().changeCurrentLocation(
-                    LatLng(_selectedAddress.coordinate!.latitude!, _selectedAddress.coordinate!.longitude!), _selectedAddress);
                 AutoRouter.of(context).navigateBack();
               }),
         ),
@@ -86,31 +93,36 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
                       .add(Marker(markerId: MarkerId("-10"), icon: BitmapDescriptor.defaultMarker, position: _selectedCoordinate));
                 });
               },
+              myLocationEnabled: true,
               mapType: MapType.normal,
               myLocationButtonEnabled: true,
               markers: Set.of(_currentMarker),
-              initialCameraPosition: CameraPosition(target: context.read<RootCubit>().currentLocation ?? LatLng(0, 0)),
+              initialCameraPosition: CameraPosition(target: context.read<AccountCubit>().currentLocation ?? LatLng(0, 0)),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: TextField(
-                controller: locationAddress,
-                decoration: InputDecoration(
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: IconButton(
-                          onPressed: () {
-                            _goToCoordinate();
-                          },
-                          icon: const Icon(Icons.search)),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey.shade800,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))),
-              ),
+            Row(
+              children: [
+                IconButton(onPressed: () => AutoRouter.of(context).navigateBack(), icon: const Icon(Icons.arrow_back_ios_new)),
+                Expanded(
+                  child: TextField(
+                    controller: locationAddress,
+                    decoration: InputDecoration(
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: 50),
+                          child: IconButton(
+                              onPressed: () {
+                                _goToCoordinate();
+                              },
+                              icon: const Icon(Icons.search)),
+                        ),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(50))),
+                  ),
+                )
+              ],
             )
           ],
         ),
@@ -121,11 +133,13 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
   Future<void> _goToCoordinate() async {
     var address = locationAddress.text.replaceAll(" ", "+");
     Results? _coordinate = await _localService.getLocationByAddress(address);
+    LatLng _latLng;
     CameraPosition _newLoc =
         CameraPosition(target: LatLng(_coordinate!.geometry!.location!.lat!, _coordinate.geometry!.location!.lng!), tilt: 60, zoom: 14);
     final GoogleMapController controller = await _controller.future;
+    _latLng = LatLng(_coordinate.geometry!.location!.lat!, _coordinate.geometry!.location!.lng!);
     setState(() {
-      _selectedCoordinate = LatLng(_coordinate.geometry!.location!.lat!, _coordinate.geometry!.location!.lng!);
+      _selectedCoordinate = _latLng;
       _addressText = _coordinate.addressComponents!.first.longName!;
     });
 

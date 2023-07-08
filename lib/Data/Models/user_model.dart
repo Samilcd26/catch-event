@@ -7,8 +7,11 @@ part 'user_model.g.dart';
 
 @JsonSerializable()
 class UserModel extends INetworkModel<UserModel> {
+  String? accessToken;
+  String? refreshToken;
   int? id;
   String? firstName;
+  String? userName;
   String? lastName;
   String? birtDate;
   String? email;
@@ -23,7 +26,10 @@ class UserModel extends INetworkModel<UserModel> {
   bool? organizer;
 
   UserModel(
-      {this.id,
+      {this.accessToken,
+      this.refreshToken,
+      this.id,
+      this.userName,
       this.firstName,
       this.lastName,
       this.birtDate,

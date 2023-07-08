@@ -7,7 +7,7 @@ import '../Models/organizer_model.dart';
 class OrganizerCubit extends Cubit<OrganizerState> {
   final IOrganizerService organizerService;
   OrganizerModel? currentOrganizer = OrganizerModel();
-
+  List<OrganizerModel>? searchList = [];
   LatLng newEventCoordinate = LatLng(0, 0);
   String newEventAddres = "";
   Address eventAddress = Address();
@@ -24,10 +24,16 @@ class OrganizerCubit extends Cubit<OrganizerState> {
     eventAddress = newAddress;
   }
 
-  void createNewEvent(Event eventModel) {
+  Future<bool> createNewEvent(Event eventModel) async {
     eventModel.address == null ? eventModel.address = [eventAddress] : eventModel.address!.add(eventAddress);
 
-    organizerService.createNewEvent(currentOrganizer!.id!, eventModel);
+    return await organizerService.createNewEvent(currentOrganizer!.id!, eventModel);
+  }
+
+  Future<void> searchOrganizer(String organizerName) async {
+    final data = await organizerService.searchOrganizer(organizerName);
+    searchList = [];
+    searchList = data!;
   }
 }
 
