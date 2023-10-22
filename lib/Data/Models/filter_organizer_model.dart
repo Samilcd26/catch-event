@@ -4,6 +4,7 @@ part 'filter_organizer_model.g.dart';
 
 @JsonSerializable()
 class FilterOrganizerModel {
+  String? eventType;
   String? country;
   String? city;
   int? userId;
@@ -21,6 +22,7 @@ class FilterOrganizerModel {
   int? maxPrice;
 
   FilterOrganizerModel(
+    this.eventType,
     this.country,
     this.city,
     this.userId,

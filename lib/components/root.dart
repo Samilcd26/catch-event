@@ -1,22 +1,24 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:threego/business/services/impl/LocationService.dart';
+import 'package:threego/app/app_router.dart';
+import 'package:threego/business/impl/AccountService.dart';
+import 'package:threego/business/impl/LocationService.dart';
+import 'package:threego/business/impl/OrganizerService.dart';
+import 'package:threego/core/SubWidgets/loading_animation.dart';
+import 'package:threego/core/network/network_service.dart';
 
 import '../Data/Models/organizer_model.dart';
 import '../Data/Models/user_model.dart';
 import '../Data/State/account_cubit.dart';
 import '../Data/State/organizer_cubit.dart';
-import '../business/services/impl/AccountService.dart';
-import '../business/services/impl/OrganizerService.dart';
-import '../core/product/helper/loading_animation.dart';
-import '../core/product/navigator/app_router.dart';
-import '../core/product/services/network_service.dart';
 
 @RoutePage()
 class RootPage extends StatefulWidget {
-  RootPage({super.key});
+  const RootPage({super.key});
 
   @override
   State<RootPage> createState() => _RootPageState();
@@ -28,9 +30,9 @@ class _RootPageState extends State<RootPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<AccountCubit>().initializ();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   context.read<AccountCubit>().initializ();
+    // });
   }
 
   @override
@@ -74,7 +76,7 @@ class _RootPageState extends State<RootPage> {
                         color: Colors.white,
                         activeColor: Colors.white,
                         tabBackgroundColor: Colors.grey.shade900,
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                         gap: 8,
                         tabs: [
                           //

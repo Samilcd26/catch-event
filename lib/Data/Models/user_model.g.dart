@@ -80,3 +80,19 @@ Map<String, dynamic> _$TicketModelToJson(TicketModel instance) =>
       'status': instance.status,
       'price': instance.price,
     };
+
+RegisterModel _$RegisterModelFromJson(Map<String, dynamic> json) =>
+    RegisterModel(
+      firstname: json['firstname'] as String?,
+      lastname: json['lastname'] as String?,
+      email: json['email'] as String?,
+      password: json['password'] as String?,
+    );
+
+Map<String, dynamic> _$RegisterModelToJson(RegisterModel instance) =>
+    <String, dynamic>{
+      'firstname': instance.firstname,
+      'lastname': instance.lastname,
+      'email': instance.email,
+      'password': instance.password,
+    };

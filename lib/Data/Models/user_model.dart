@@ -79,3 +79,26 @@ class TicketModel {
     return _$TicketModelToJson(this);
   }
 }
+
+@JsonSerializable()
+class RegisterModel extends INetworkModel<RegisterModel> {
+  String? firstname;
+  String? lastname;
+  String? email;
+  String? password;
+
+  RegisterModel({this.firstname, this.lastname, this.email, this.password});
+
+  factory RegisterModel.fromJson(Map<String, dynamic> json) {
+    return _$RegisterModelFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() {
+    return _$RegisterModelToJson(this);
+  }
+
+  @override
+  RegisterModel fromJson(Map<String, dynamic> json) {
+    return _$RegisterModelFromJson(json);
+  }
+}

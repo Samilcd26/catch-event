@@ -1,14 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:threego/business/IOrganizerService.dart';
 
-import '../../business/services/IOrganizerService.dart';
 import '../Models/organizer_model.dart';
 
 class OrganizerCubit extends Cubit<OrganizerState> {
   final IOrganizerService organizerService;
   OrganizerModel? currentOrganizer = OrganizerModel();
   List<OrganizerModel>? searchList = [];
-  LatLng newEventCoordinate = LatLng(0, 0);
+  LatLng newEventCoordinate = const LatLng(0, 0);
   String newEventAddres = "";
   Address eventAddress = Address();
   OrganizerCubit({required this.organizerService}) : super(OrganizerInitial());

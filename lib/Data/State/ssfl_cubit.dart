@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:threego/business/ISSFLService.dart';
 
-import '../../business/services/ISSFLService.dart';
 import '../Models/organizer_model.dart';
 
 class SSFLCubit extends Cubit<SSFLState> {

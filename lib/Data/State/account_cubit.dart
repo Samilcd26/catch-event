@@ -1,14 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator_platform_interface/src/models/position.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kartal/kartal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threego/Data/Models/gaddress_model.dart';
-import 'package:threego/business/services/ILocationService.dart';
+import 'package:threego/business/IAccountService.dart';
+import 'package:threego/business/ILocationService.dart';
+import 'package:threego/business/IOrganizerService.dart';
 
-import '../../business/services/IAccountService.dart';
-import '../../business/services/IOrganizerService.dart';
 import '../Models/filter_organizer_model.dart';
 import '../Models/organizer_model.dart';
 import '../Models/user_model.dart';
@@ -25,19 +26,19 @@ class AccountCubit extends Cubit<AccountState> {
   OrganizerModel? currentOrganizer = OrganizerModel();
   bool isUserLogin = false;
   late final SharedPreferences prefs;
-  List<OrganizerModel> organizerData = [];
-  List<Event>? events = [];
+  List<Event> eventsData = [];
   LatLng? currentLocation;
   Address? currentAddress = Address();
   List<OrganizerModel>? followOrganizerList = [];
   bool changeState = true;
   FilterOrganizerModel filterModel =
-      FilterOrganizerModel("Türkiye", "Eskişehir", 1, null, null, null, null, null, null, null, null, null, null, null, null);
+      FilterOrganizerModel("EVENT", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 //? //////////////////////////////////////////////////////////////////
 
   //* First Login
   Future<bool> loginUser(String email, String password) async {
     currentUser = await accoundService.loginUser(email, password);
+    filterModel.userId = currentUser!.id;
     if (currentUser?.id != null || currentUser != null) {
       prefs.setString("userEmail", email);
       prefs.setString("userPassword", password);
@@ -71,14 +72,19 @@ class AccountCubit extends Cubit<AccountState> {
     // emit(SuccesOrganizerData(data));
   }
 
+  Future<bool> registerNewUser(RegisterModel registerModel) async {
+    return accoundService.register(registerModel);
+    // emit(SuccesOrganizerData(data));
+  }
+
   //?Sharedpreference open function
   Future<bool> checkLoginUser() async {
     if (!isUserLogin) {
       await checkSharedPreferences();
-      String? user_email = prefs.getString("userEmail");
-      String? user_Password = prefs.getString("userPassword");
-      if (user_email.isNotNullOrNoEmpty && user_Password.isNotNullOrNoEmpty) {
-        isUserLogin = await loginUser(user_email!, user_Password!);
+      String? userEmail = prefs.getString("userEmail");
+      String? userPassword = prefs.getString("userPassword");
+      if (userEmail.ext.isNotNullOrNoEmpty && userPassword.ext.isNotNullOrNoEmpty) {
+        isUserLogin = await loginUser(userEmail!, userPassword!);
         return true;
       } else {
         return false;
@@ -97,7 +103,7 @@ class AccountCubit extends Cubit<AccountState> {
       await _getCurrentOrganizerById();
       await getAllOrganizerByFilter();
       await _getFollowOrganizers();
-      await _getAllEvent();
+
       _changeLoadingStatus();
     }
   }
@@ -110,14 +116,17 @@ class AccountCubit extends Cubit<AccountState> {
     }
   }
 
-  Future<void> getAllOrganizerByFilter() async {
-    final data = await organizerService.getOrganizerByFilter(filterModel);
-    organizerData = data!;
-  }
-
-  Future<void> _getAllEvent() async {
-    events!.clear();
-    Future.wait(organizerData.expand((org) => org.event!.map((ev) async => events!.add(ev))));
+  Future<bool> getAllOrganizerByFilter() async {
+    filterModel.city = currentAddress!.city;
+    filterModel.country = currentAddress!.country;
+    filterModel.userId = currentUser!.id;
+    final data = await organizerService.getEventByFilter(filterModel);
+    if (data != null) {
+      eventsData = data;
+      _changeStateStatus();
+      return true;
+    }
+    return false;
   }
 
   Future<void> changeCurrentLocation(LatLng newLocation, Address newAddres) async {
@@ -146,7 +155,7 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> _getFollowOrganizers() async {
-    if (currentUser!.followOrganizer.isNotNullOrEmpty) {
+    if (currentUser!.followOrganizer.ext.isNotNullOrEmpty) {
       final data = await accoundService.getFollowOrganizers(currentUser!.followOrganizer!);
       followOrganizerList = [];
       followOrganizerList = data;
@@ -154,14 +163,14 @@ class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> _getCurrentLocation() async {
-    final data;
+    final Position data;
     if (currentLocation == null) {
       data = await organizerService.getCurrentLocation();
 
       currentLocation = LatLng(data.latitude, data.longitude);
-      Results? _data = await locationService.getLocationByCoordinate(currentLocation!);
-      var _addressComponent = _data!.addressComponents;
-      _addressComponent!.forEach((element) {
+      Results? data0 = await locationService.getLocationByCoordinate(currentLocation!);
+      var addressComponent = data0!.addressComponents;
+      for (var element in addressComponent!) {
         if (element.types!.contains("country")) {
           //!County
           currentAddress!.country = element.longName ?? "";
@@ -181,10 +190,10 @@ class AccountCubit extends Cubit<AccountState> {
           //!District
           currentAddress!.address2 = element.longName ?? "";
         }
-      });
+      }
 
-      currentAddress!.address1 = _data.formattedAddress;
-      currentAddress!.coordinate = Coordinate(latitude: _data.geometry!.location!.lat, longitude: _data.geometry!.location!.lat);
+      currentAddress!.address1 = data0.formattedAddress;
+      currentAddress!.coordinate = Coordinate(latitude: data0.geometry!.location!.lat, longitude: data0.geometry!.location!.lat);
 
       filterModel.country = currentAddress!.country;
       filterModel.city = currentAddress!.city;

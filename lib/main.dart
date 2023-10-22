@@ -1,23 +1,23 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:threego/business/services/impl/LocationService.dart';
+import 'package:threego/app/app_router.dart';
+import 'package:threego/business/impl/AccountService.dart';
+import 'package:threego/business/impl/LocationService.dart';
+import 'package:threego/business/impl/OrganizerService.dart';
+import 'package:threego/business/impl/SSFLService.dart';
+import 'package:threego/core/network/network_service.dart';
 
 import 'Data/State/account_cubit.dart';
 import 'Data/State/organizer_cubit.dart';
 import 'Data/State/ssfl_cubit.dart';
-import 'business/services/impl/AccountService.dart';
-import 'business/services/impl/OrganizerService.dart';
-import 'business/services/impl/SSFLService.dart';
-import 'core/product/navigator/app_router.dart';
-import 'core/product/services/network_service.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-//
+  //
   final _appRouter = AppRouter();
   //
   @override

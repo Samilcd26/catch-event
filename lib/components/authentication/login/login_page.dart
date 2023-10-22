@@ -1,16 +1,16 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:threego/app/app_router.dart';
+import 'package:threego/core/SubWidgets/dividers.dart';
+import 'package:threego/core/SubWidgets/loading_animation.dart';
 
 import '../../../Data/State/account_cubit.dart';
-import '../../../core/product/helper/dividers.dart';
-import '../../../core/product/helper/loading_animation.dart';
-import '../../../core/product/helper/snack-bars.dart';
-import '../../../core/product/navigator/app_router.dart';
 
 @RoutePage()
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -95,29 +95,47 @@ class _LoginPageState extends State<LoginPage> {
                               if (_formKey.currentState!.validate()) {
                                 isUserLoaded = await context.read<AccountCubit>().loginUser(emailController.text, passwordController.text);
                                 if (isUserLoaded) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SuccesMessage("Giriş", "Giriş Başarılı"));
+                                  if (context.mounted) return;
+                                  AnimatedSnackBar.rectangle(
+                                    'Success',
+                                    'Giriş Başarılı',
+                                    type: AnimatedSnackBarType.success,
+                                    brightness: Brightness.light,
+                                  ).show(
+                                    context,
+                                  );
                                   context.read<AccountCubit>().initializ();
                                   Future.delayed(const Duration(milliseconds: 200), () {
                                     context.read<AccountCubit>().currentUser;
                                     AutoRouter.of(context).push(RootRoute());
                                   });
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(ErrorMessage("Giriş", "Giriş Başarısız"));
+                                  if (context.mounted) return;
+                                  AnimatedSnackBar.rectangle(
+                                    'Success',
+                                    'Giriş Başarısız',
+                                    type: AnimatedSnackBarType.error,
+                                    brightness: Brightness.light,
+                                  ).show(
+                                    context,
+                                  );
                                 }
                               }
                             },
-                            child: Text("Login"),
-                            style: TextButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: Colors.grey.shade100)),
+                            style: TextButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: Colors.grey.shade100),
+                            child: const Text("Login")),
                         DividerWithText(text: "OR", hight: 20),
                         TextButton(
-                            onPressed: () {},
-                            child: Text("Register"),
-                            style: TextButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: Colors.grey.shade100)),
+                            onPressed: () {
+                              AutoRouter.of(context).push(const RegisterRoute());
+                            },
+                            style: TextButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: Colors.grey.shade100),
+                            child: const Text("Register")),
                         const SizedBox(height: 50),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             _BoxIconButton(icon: Icons.g_mobiledata),
                             _BoxIconButton(icon: Icons.facebook),
                             _BoxIconButton(icon: Icons.login),
@@ -133,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
         : const LoadingBar();
   }
 
-  InputDecoration LoginInputDecoration(String hitText) => InputDecoration(border: OutlineInputBorder(), hintText: hitText);
+  InputDecoration LoginInputDecoration(String hitText) => InputDecoration(border: const OutlineInputBorder(), hintText: hitText);
 }
 
 class _BoxIconButton extends StatelessWidget {
@@ -144,11 +162,11 @@ class _BoxIconButton extends StatelessWidget {
     return Container(
       height: 70,
       width: 70,
-      decoration: BoxDecoration(border: Border.all(color: Colors.white), borderRadius: BorderRadius.all(Radius.circular(15))),
+      decoration: BoxDecoration(border: Border.all(color: Colors.white), borderRadius: const BorderRadius.all(Radius.circular(15))),
       child: IconButton(
           onPressed: () {},
           icon: SizedBox.fromSize(
-            size: Size.fromRadius(200),
+            size: const Size.fromRadius(200),
             child: FittedBox(
               child: Icon(icon),
             ),

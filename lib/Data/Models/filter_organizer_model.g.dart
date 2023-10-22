@@ -9,6 +9,7 @@ part of 'filter_organizer_model.dart';
 FilterOrganizerModel _$FilterOrganizerModelFromJson(
         Map<String, dynamic> json) =>
     FilterOrganizerModel(
+      json['eventType'] as String?,
       json['country'] as String?,
       json['city'] as String?,
       json['userId'] as int?,
@@ -31,6 +32,7 @@ FilterOrganizerModel _$FilterOrganizerModelFromJson(
 Map<String, dynamic> _$FilterOrganizerModelToJson(
         FilterOrganizerModel instance) =>
     <String, dynamic>{
+      'eventType': instance.eventType,
       'country': instance.country,
       'city': instance.city,
       'userId': instance.userId,
